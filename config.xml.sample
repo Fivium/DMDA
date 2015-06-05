@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smtp_config>
+  <!-- The port the server will listen on. 1024 and below will require root. -->
+  <port>2601</port>
+  <!-- Logging level can be set to debug, info or error -->
+  <logging_level>info</logging_level>
+  <!-- Logging mode can be set to console or file -->
+  <logging_mode>console</logging_mode>
+  <!-- The generic message that is used when an email is rejected -->
+  <email_rejection_message>An unexpected error has occurred and your email has not been received. Please try again later.</email_rejection_message>
+  <!-- The max size the message body can be in megabytes -->
+  <message_size_limit_mb>15</message_size_limit_mb>
+  <!-- AV can be disabled by setting the mode to 'none' -->
+  <anti_virus>
+    <mode>clamd</mode>
+    <server>clamd_server</server>
+    <port>3310</port>
+  </anti_virus>
+  <!-- The list of databases. Databases have a many to 1 relationship with recipients. -->
+  <database_list>
+    <database>
+      <name>database_name</name>
+      <!-- This is the same URL that clobber uses -->
+      <jdbc_url>jdbc:oracle:thin:@database_host:1521:service_name</jdbc_url>
+      <username>user</username>
+      <password>password</password>
+      <!--
+      This is the query the database will use to store the email in the database. The bind params are "mail_id"
+      , "repository", "from_address", "recipient", "remote_hostname", "remote_address", "message_body", "subject"
+      and "header_xml_clob"
+      -->
+      <store_query>
+INSERT INTO inbox(
+  message_name
+, repository_name
+, message_state
+, sender
+, recipients
+, remote_host
+, remote_addr
+, message_body
+, last_updated
+, message_subject
+) VALUES (
+  :mail_id
+, :repository
+, 'root'
+, :from_address
+, :recipient
+, :remote_hostname
+, :remote_address
+, :message_body
+, sysdate
+, :subject
+)
+      </store_query>
+    </database>
+  </database_list>
+  <!-- The recipient list has a many to 1 relationship with the databases above. -->
+  <recipient_list>
+    <recipient>
+      <!--
+      this is the domain part of an email address user@domain and any email sent to this domain will be stored as
+      defined by the store query of that database
+      -->
+      <domain>localhost</domain>
+      <database>database_name</database>
+    </recipient>
+  </recipient_list>
+</smtp_config>

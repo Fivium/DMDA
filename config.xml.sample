@@ -27,7 +27,7 @@
       <!--
       This is the query the database will use to store the email in the database. The bind params are "mail_id"
       , "repository", "from_address", "recipient", "remote_hostname", "remote_address", "message_body", "subject"
-      and "header_xml_clob"
+	  , "sent_date" and "header_xml_clob"
       -->
       <store_query>
 INSERT INTO inbox(

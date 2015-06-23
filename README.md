@@ -10,15 +10,31 @@ The main goals of this tool were:
 - Light weight: The tool is small, fast and easy to configure.
 
 
+Installation
+--------------------------------------
+Redhat/CentOS:
+- Download /Builds/x.x/redhat/dmda-x.x-x.x86_64.rpm
+- yum localinstall dmda-x.x-x.x86_64.rpm
+
+Other sysv (initd) distributions:
+- Build the jar
+- Download dmdad and config.xml.example
+- Put these files in /opt/dmda
+- ln -s /opt/dmda/dmdad /etc/init.d
+
 Use
 --------------------------------------
-Copy config.xml.sample to config.xml and modify it to point it at your database, configure your virus scanner etc.
-Run jar
-
+dmdad implements the basic service commands which can be invoked "service dmdad command":
+- start - Starts the service. It will report if the server started successfully but might not wait until the server connects to the database. It's always worth checking the logs to see if all the connection pools for your databases have started up correctly.
+- stop - Stops the service if it is started.
+- restart - stops and restarts the service. There will be a few seconds of downtime.
 
 Requirements
 --------------------------------------
 
 - Java : >=1.6
 
-Maven needs to sync out the dependencies but builds currently you need to do a regular jar build to include the OJDBC driver in /lib
+Building
+--------------------------------------
+
+Import the maven project by importing pom.xml into your IDE of choice. Maven will download all dependencies apart from the oracle drivers which will have to be added manually. The jar can then be built in the normal way.

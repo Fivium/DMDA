@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -35,6 +36,7 @@ public class EmailMessage {
   private byte[] mData;
   private HashMap<String, String> mHeaderMap;
   private Document mHeaderXML;
+  private Date mSentDate;
 
   private Logger mLogger = Logger.getLogger(DatabaseMessageHandler.class);
   private SMTPConfig mSMTPConfig;
@@ -114,6 +116,7 @@ public class EmailMessage {
       );
 
       mSubject = lMimeMessage.getSubject();
+      mSentDate = lMimeMessage.getSentDate();
       Enumeration<Header> lHeaderEnumeration = lMimeMessage.getAllHeaders();
 
       while(lHeaderEnumeration.hasMoreElements()){
@@ -279,5 +282,9 @@ public class EmailMessage {
       }
     }
     return mHeaderXML;
+  }
+
+  public Date getSentDate() {
+    return mSentDate;
   }
 }

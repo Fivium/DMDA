@@ -9,7 +9,8 @@ public enum BindParams {
   , REMOTE_ADDRESS("remote_address")
   , MESSAGE_BODY("message_body")
   , SUBJECT("subject")
-  , HEADER_XML("header_xml_clob");
+  , HEADER_XML("header_xml_clob")
+  , SENT_DATE("sent_date");
 
   private final String mParamText;
 

@@ -1,14 +1,14 @@
 package uk.co.fivium.dmda.EmailMessages;
 
-import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
-import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionHandler;
-import uk.co.fivium.dmda.Server.Enumerations.BindParams;
-import uk.co.fivium.dmda.Server.SMTPConfig;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OraclePreparedStatement;
 import org.apache.log4j.Logger;
 import org.subethamail.smtp.RejectException;
 import org.w3c.dom.Document;
+import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
+import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionHandler;
+import uk.co.fivium.dmda.Server.Enumerations.BindParams;
+import uk.co.fivium.dmda.Server.SMTPConfig;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 public class DatabaseMessageStorer implements MessageStorer{
   private DatabaseConnectionHandler mDatabaseConnectionHandler;
@@ -58,9 +60,9 @@ public class DatabaseMessageStorer implements MessageStorer{
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.REMOTE_ADDRESS.getText(), pEmailMessage.getRemoteAddress());
         setBlobAtNameIfExists(lStoreQuery, lStatement, BindParams.MESSAGE_BODY.getText(), pEmailMessage.getDataStream());
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.SUBJECT.getText(), pEmailMessage.getSubject());
+        setDateAtNameIfExists(lStoreQuery, lStatement, BindParams.SENT_DATE.getText(), pEmailMessage.getSentDate());
 
-
-
+        // Header XML
         if (lStoreQuery.contains(":" + BindParams.HEADER_XML.getText())){
           try {
             setXMLTypeAtName(lStatement, BindParams.HEADER_XML.getText(), pEmailMessage.getHeadersXML());
@@ -90,6 +92,19 @@ public class DatabaseMessageStorer implements MessageStorer{
           mLogger.error("Error closing database connection " + lConnectionDetails.toString(), ex);
           throw new RejectException();
         }
+      }
+    }
+  }
+
+  private void setDateAtNameIfExists(String pStoreQuery, OraclePreparedStatement pStatement, String pName, Date pSentDate)
+  throws SQLException {
+    if (pStoreQuery.contains(":" + pName)){
+      if (pSentDate != null){
+        java.sql.Timestamp lSQLDate = new Timestamp(pSentDate.getTime());
+        pStatement.setTimestampAtName(pName, lSQLDate);
+      }
+      else {
+        pStatement.setDateAtName(pName, null);
       }
     }
   }

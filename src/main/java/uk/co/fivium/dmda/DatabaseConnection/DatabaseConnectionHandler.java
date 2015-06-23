@@ -11,8 +11,8 @@ import java.util.Map;
 public class DatabaseConnectionHandler {
   private SMTPConfig mSMTPConfig;
   private HashMap<String, HikariDataSource> mDatabaseConnectionPoolMapping;
-  private static final DatabaseConnectionHandler mInstance = new DatabaseConnectionHandler();
 
+  private static final DatabaseConnectionHandler mInstance = new DatabaseConnectionHandler();
   private static final int POOL_SIZE = 1;
 
   public static DatabaseConnectionHandler getInstance(){
@@ -21,6 +21,7 @@ public class DatabaseConnectionHandler {
 
   private DatabaseConnectionHandler() {
     mSMTPConfig = SMTPConfig.getInstance();
+    mDatabaseConnectionPoolMapping = new HashMap<String, HikariDataSource>();
   }
 
   /**
@@ -30,7 +31,6 @@ public class DatabaseConnectionHandler {
    */
   public void createConnectionPools()
   throws DatabaseConnectionException {
-      mDatabaseConnectionPoolMapping = new HashMap<String, HikariDataSource>();
       Map<String, DatabaseConnectionDetails> lDatabaseConnectionDetailsMapping = mSMTPConfig.getDatabaseConnectionDetailsMapping();
 
       for (String lDatabase : lDatabaseConnectionDetailsMapping.keySet()){

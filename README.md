@@ -13,11 +13,11 @@ The main goals of this tool were:
 Installation
 --------------------------------------
 Redhat/CentOS:
-- Download /Builds/x.x/redhat/dmda-x.x-x.x86_64.rpm
+- Download dmda-x.x-x.x86_64.rpm from the releases page
 - yum localinstall dmda-x.x-x.x86_64.rpm
 
 Other sysv (initd) distributions:
-- Build the jar
+- Build or download the jar
 - Download dmdad and config.xml.example
 - Put these files in /opt/dmda
 - ln -s /opt/dmda/dmdad /etc/init.d

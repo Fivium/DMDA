@@ -39,8 +39,9 @@ public class DatabaseMessageStorer implements MessageStorer{
       String lRepository = lRecipient.substring(0, lRecipient.indexOf('@'));
 
       DatabaseConnectionDetails lConnectionDetails = mSMTPConfig.getConnectionDetailsForRecipient(lRecipientDomain);
+      Connection lConnection = null;
       try {
-        Connection lConnection = mDatabaseConnectionHandler.getConnection(lRecipientDomain);
+        lConnection = mDatabaseConnectionHandler.getConnection(lRecipientDomain);
         // Unwrap the connection into an oracle connection so we can do oracle specific operations
         OracleConnection lOracleConnection = lConnection.unwrap(OracleConnection.class);
 
@@ -53,11 +54,11 @@ public class DatabaseMessageStorer implements MessageStorer{
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.REPOSITORY.getText(), lRepository);
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.FROM.getText(), pEmailMessage.getFrom());
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.RECIPIENT.getText(), lRecipient);
-        // TODO this param currently produces the IP not the hostname.
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.REMOTE_HOSTNAME.getText(), pEmailMessage.getRemoteHostname());
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.REMOTE_ADDRESS.getText(), pEmailMessage.getRemoteAddress());
         setBlobAtNameIfExists(lStoreQuery, lStatement, BindParams.MESSAGE_BODY.getText(), pEmailMessage.getDataStream());
         setStringAtNameIfExists(lStoreQuery, lStatement, BindParams.SUBJECT.getText(), pEmailMessage.getSubject());
+
 
 
         if (lStoreQuery.contains(":" + BindParams.HEADER_XML.getText())){
@@ -72,12 +73,23 @@ public class DatabaseMessageStorer implements MessageStorer{
 
 
         lStatement.execute();
-        // DO NOT close the oracle connection. The connection should stay open and closing the wrapped connection returns it to the pool
-        lConnection.close();
+        lStatement.close();
       }
       catch (SQLException ex) {
         mLogger.error("Error storing email in database " + lConnectionDetails.toString(), ex);
         throw new RejectException();
+      }
+      finally {
+        try {
+          if (lConnection!=null && !lConnection.isClosed()){
+            lConnection.rollback();
+            lConnection.close();
+          }
+        }
+        catch (SQLException ex) {
+          mLogger.error("Error closing database connection " + lConnectionDetails.toString(), ex);
+          throw new RejectException();
+        }
       }
     }
   }

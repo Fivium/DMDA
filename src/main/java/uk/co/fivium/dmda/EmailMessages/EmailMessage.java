@@ -108,10 +108,9 @@ public class EmailMessage {
   private void readMessageBody(){
     MimeMessage lMimeMessage = null;
     try {
-      //TODO make this comment make sense
       lMimeMessage = new MimeMessage(
         null // The session is not required as we're not passing the email on
-      , new ByteInputStream(mData, mData.length) // Can't use pDataStream as it has been consumed by readInputStream
+      , new ByteInputStream(mData, mData.length) // Can't use the data stream as it's read once
       );
 
       mSubject = lMimeMessage.getSubject();

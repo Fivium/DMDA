@@ -44,7 +44,7 @@ public class SMTPConfig {
   private HashMap<String, String> mRecipientDatabaseMapping;
   private HashMap<String, DatabaseConnectionDetails> mDatabaseConnectionDetailsMap;
   private String mEmailRejectionMessage;
-  private String mAVMode; // TODO change to clamd
+  private String mAVMode;
   private String mAVServer;
   private int mAVPort;
   private int mMessageSizeLimit;
@@ -206,7 +206,7 @@ public class SMTPConfig {
 
     if (LogginModes.FILE.getText().equals(lLoggingMode)){
       FileAppender lFileAppender = new FileAppender();
-      lFileAppender.setFile("dmda.log");
+      lFileAppender.setFile("logs/dmda.log");
       lFileAppender.activateOptions();
       lAppender = lFileAppender;
     }

@@ -13,6 +13,8 @@ public class DatabaseConnectionHandler {
   private HashMap<String, HikariDataSource> mDatabaseConnectionPoolMapping;
   private static final DatabaseConnectionHandler mInstance = new DatabaseConnectionHandler();
 
+  private static final int POOL_SIZE = 1;
+
   public static DatabaseConnectionHandler getInstance(){
     return mInstance;
   }
@@ -35,6 +37,7 @@ public class DatabaseConnectionHandler {
         DatabaseConnectionDetails lConnectionDetails = lDatabaseConnectionDetailsMapping.get(lDatabase);
 
         HikariDataSource lDataSource = new HikariDataSource();
+        lDataSource.setMaximumPoolSize(POOL_SIZE);
         lDataSource.setJdbcUrl(lConnectionDetails.mJdbcUrl);
         lDataSource.setUsername(lConnectionDetails.mUsername);
         lDataSource.setPassword(lConnectionDetails.mPassword);

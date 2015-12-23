@@ -32,7 +32,7 @@ dmdad implements the basic service commands which can be invoked "service dmdad 
 Requirements
 --------------------------------------
 
-- Java : >=1.6
+- Java : >=1.8
 
 Building
 --------------------------------------

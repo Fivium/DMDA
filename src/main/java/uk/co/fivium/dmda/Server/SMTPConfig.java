@@ -201,7 +201,7 @@ public class SMTPConfig {
     String lLoggingMode = lSMTPConfig.getLoggingMode();
     Logger lRootLogger = Logger.getRootLogger();
 
-    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy hh:mm} %5p [%t] %m%n");
+    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
     Appender lAppender = new NullAppender();
 
     if (LogginModes.FILE.getText().equals(lLoggingMode)){

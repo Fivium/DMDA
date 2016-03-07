@@ -15,6 +15,7 @@
     <mode>clamd</mode>
     <server>clamd_server</server>
     <port>3310</port>
+    <timeout_ms>300000</timeout_ms>
   </anti_virus>
   <!-- The list of databases. Databases have a many to 1 relationship with recipients. -->
   <database_list>

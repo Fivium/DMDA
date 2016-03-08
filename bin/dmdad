@@ -1,8 +1,8 @@
 #!/bin/bash
-# myapp daemon
+# dmda daemon
 # chkconfig: 345 20 80
-# description: myapp daemon
-# processname: myapp
+# description: dmda daemon
+# processname: dmda
 
 DAEMON_PATH="/opt/dmda"
 
@@ -15,17 +15,17 @@ SCRIPTNAME=/etc/init.d/$NAME
 case "$1" in
 start)
 	printf "%-50s" "Starting $NAME..."
-	
+
 	if [ -f $PIDFILE ]; then
-		printf "%s\n" "Cannot start server as $PIDFILE exists." 	
+		printf "%s\n" "Cannot start server as $PIDFILE exists."
 	else
 		cd $DAEMON_PATH
 		$DAEMON &
 		PID=`echo $!`
-		
+
 		# Wait 2 seconds before creating the pid file incase the server encounters a startup error
         	sleep 2
-		
+
 		if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
 			printf "%s\n" "Fail"
 		else

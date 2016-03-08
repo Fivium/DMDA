@@ -21,7 +21,7 @@ public class DatabaseConnectionHandler {
 
   private DatabaseConnectionHandler() {
     mSMTPConfig = SMTPConfig.getInstance();
-    mDatabaseConnectionPoolMapping = new HashMap<String, HikariDataSource>();
+    mDatabaseConnectionPoolMapping = new HashMap<>();
   }
 
   /**
@@ -65,8 +65,7 @@ public class DatabaseConnectionHandler {
     String lDatabaseName = mSMTPConfig.getDatabaseForRecipient(pDestinationDomain);
     try {
       HikariDataSource lDataSource = mDatabaseConnectionPoolMapping.get(lDatabaseName);
-      Connection lConnection = lDataSource.getConnection();
-      return lConnection;
+      return lDataSource.getConnection();
     }
     catch (SQLException ex) {
       DatabaseConnectionDetails lDatabaseConnectionDetails = mSMTPConfig.getConnectionDetailsForDatabase(lDatabaseName);
@@ -78,8 +77,6 @@ public class DatabaseConnectionHandler {
    * Shuts down the connection pools
    */
   public void shutDown() {
-    for (HikariDataSource lDataSource : mDatabaseConnectionPoolMapping.values()) {
-      lDataSource.shutdown();
-    }
+    mDatabaseConnectionPoolMapping.values().forEach(HikariDataSource::shutdown);
   }
 }

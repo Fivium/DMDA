@@ -4,7 +4,6 @@ import fi.solita.clamav.ClamAVClient;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class ClamAVScanner implements AVScanner {
   private ClamAVClient mClamAVClient;
@@ -18,16 +17,11 @@ public class ClamAVScanner implements AVScanner {
     return mClamAVClient.scan(pData);
   }
 
-  private boolean isClean(byte[] lReply)
-  throws UnsupportedEncodingException {
-    return mClamAVClient.isCleanReply(lReply);
-  }
-
   @Override
   public boolean checkContent(byte[] pData)
   throws IOException {
     byte[] lReply = scan(pData);
-    return isClean(lReply);
+    return ClamAVClient.isCleanReply(lReply);
   }
 
 }

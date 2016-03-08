@@ -19,7 +19,7 @@ public class AVScannerFactory {
       return new NoAVScanner();
     }
     else {
-      throw new RuntimeException("Error creating virus scanner instance. Configuration invalid past startup. This should be handled and there is a bug. Scnner Mode: " + lScannerMode);
+      throw new RuntimeException("Error creating virus scanner instance. Configuration invalid past startup. This should be handled and there is a bug. Scanner Mode: " + lScannerMode);
     }
   }
 }

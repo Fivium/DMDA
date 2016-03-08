@@ -1,6 +1,5 @@
 package uk.co.fivium.dmda.EmailMessages;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.apache.log4j.Logger;
 import org.subethamail.smtp.MessageContext;
 import org.subethamail.smtp.RejectException;
@@ -17,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -112,7 +112,7 @@ public class EmailMessage {
     try {
       lMimeMessage = new MimeMessage(
         null // The session is not required as we're not passing the email on
-      , new ByteInputStream(mData, mData.length) // Can't use the data stream as it's read once
+      , new ByteArrayInputStream(mData) // Can't use the data stream as it's read once
       );
 
       mSubject = lMimeMessage.getSubject();
@@ -211,7 +211,7 @@ public class EmailMessage {
   }
 
   public InputStream getDataStream() {
-    return new ByteInputStream(mData, mData.length);
+    return new ByteArrayInputStream(mData);
   }
 
   public String getSubject() {

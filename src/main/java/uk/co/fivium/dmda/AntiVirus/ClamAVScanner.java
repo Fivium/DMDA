@@ -10,7 +10,7 @@ public class ClamAVScanner implements AVScanner {
   private ClamAVClient mClamAVClient;
 
   protected ClamAVScanner(SMTPConfig pSMTPConfig){
-    mClamAVClient = new ClamAVClient(pSMTPConfig.getAVServer(), pSMTPConfig.getAVPort());
+    mClamAVClient = new ClamAVClient(pSMTPConfig.getAVServer(), pSMTPConfig.getAVPort(), pSMTPConfig.getAVTimeoutMS());
   }
 
   private byte[] scan(byte[] pData)

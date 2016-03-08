@@ -47,6 +47,7 @@ public class SMTPConfig {
   private String mAVMode;
   private String mAVServer;
   private int mAVPort;
+  private int mAVTimeoutMS;
   private int mMessageSizeLimit;
 
   // Make this a singleton
@@ -98,6 +99,7 @@ public class SMTPConfig {
     if (AVModes.CLAM.getText().equals(mAVMode)) {
       mAVPort = getUniqueChildNodeInt(lAVConfig, "port");
       mAVServer = getUniqueChildNodeText(lAVConfig, "server");
+      mAVTimeoutMS = getUniqueChildNodeInt(lAVConfig, "timeout_ms");
     }
     else if (!AVModes.NONE.getText().equals(mAVMode)){
       throw new ConfigurationException("Unknown anti-virus mode " + mAVMode);
@@ -252,6 +254,10 @@ public class SMTPConfig {
     return mAVPort;
   }
 
+  public int getAVTimeoutMS() {
+    return mAVTimeoutMS;
+  }
+
   public String getAVServer() {
     return mAVServer;
   }
@@ -314,6 +320,7 @@ public class SMTPConfig {
 
     return (Element) lChildNodes.item(0);
   }
+
   /**
    * Fetches the text content of a child node and casts it to int
    *

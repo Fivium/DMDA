@@ -30,7 +30,7 @@ Building
 --------------------------------------
 - Open a shell and `cd` to the DMDA folder (not this bin folder)
 - Make the project with maven: `mvn install`
-- Copy the jar to the bin folder: `cp ./target/dmda-1.1-SNAPSHOT-jar-with-dependencies.jar ./bin/dmda.jar`
+- Copy the jar to the bin folder: `cp ./target/dmda-x.x-SNAPSHOT-jar-with-dependencies.jar ./bin/dmda.jar`
 - Copy the sample config file to the bin folder: `cp ./config.xml.sample ./bin/config.xml.sample`
 - Create a zipped copy of the bin folder: `tar czf dmda.tar.gz -C ./bin . --exclude='README.md' --exclude='dmda.spec'`
 - Follow general RPM build process, putting dmda.tar.gz in your SOURCES folder and putting 

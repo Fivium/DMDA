@@ -35,3 +35,6 @@ Building
 - Create a zipped copy of the bin folder: `tar czf dmda.tar.gz -C ./bin . --exclude='README.md' --exclude='dmda.spec'`
 - Follow general RPM build process, putting dmda.tar.gz in your SOURCES folder and putting 
   [dmda.spec](dmda.spec) in SPECS before running `rpmbuild -ba dmda.spec`
+
+**Note:** Be wary of line endings. When getting files from git make sure the spec file and dmdad shell script are using
+`\n` line endings otherwise the rpm will not be buildable or installable.

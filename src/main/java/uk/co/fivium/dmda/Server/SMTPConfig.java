@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import uk.co.fivium.dmda.Server.Enumerations.BindParams;
-import uk.co.fivium.dmda.Server.Enumerations.LogginModes;
+import uk.co.fivium.dmda.Server.Enumerations.LoggingModes;
 import uk.co.fivium.dmda.Server.Enumerations.LoggingLevels;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -206,16 +206,16 @@ public class SMTPConfig {
     Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
     Appender lAppender = new NullAppender();
 
-    if (LogginModes.FILE.getText().equals(lLoggingMode)){
+    if (LoggingModes.FILE.getText().equals(lLoggingMode)){
       FileAppender lFileAppender = new FileAppender();
       lFileAppender.setFile("logs/dmda.log");
       lFileAppender.activateOptions();
       lAppender = lFileAppender;
     }
-    else if (LogginModes.CONSOLE.getText().equals(lLoggingMode)){
+    else if (LoggingModes.CONSOLE.getText().equals(lLoggingMode)){
       lAppender = new ConsoleAppender(lLayout);
     }
-    else if(!LogginModes.NONE.getText().equals(lLoggingMode)){
+    else if(!LoggingModes.NONE.getText().equals(lLoggingMode)){
       throw new ConfigurationException("Invalid logger mode " + lLoggingMode);
     }
 

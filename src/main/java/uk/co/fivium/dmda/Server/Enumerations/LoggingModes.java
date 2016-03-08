@@ -1,12 +1,12 @@
 package uk.co.fivium.dmda.Server.Enumerations;
 
-public enum LogginModes {
+public enum LoggingModes {
     CONSOLE("console")
   , FILE("file")
   , NONE("none");
 
   private final String mMode;
-  private LogginModes(String pMode){
+  private LoggingModes(String pMode){
     mMode = pMode;
   }
 

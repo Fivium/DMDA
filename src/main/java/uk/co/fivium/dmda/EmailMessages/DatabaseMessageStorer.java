@@ -37,7 +37,7 @@ public class DatabaseMessageStorer implements MessageStorer{
   @Override
   public void storeMessage(EmailMessage pEmailMessage) {
     for (String lRecipient : pEmailMessage.getRecipients()) {
-      String lRecipientDomain = lRecipient.substring(lRecipient.indexOf('@')+1);
+      String lRecipientDomain = lRecipient.substring(lRecipient.indexOf('@')+1).toLowerCase();
       String lRepository = lRecipient.substring(0, lRecipient.indexOf('@'));
 
       DatabaseConnectionDetails lConnectionDetails = mSMTPConfig.getConnectionDetailsForRecipient(lRecipientDomain);

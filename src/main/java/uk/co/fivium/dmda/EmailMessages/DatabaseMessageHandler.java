@@ -50,7 +50,7 @@ implements MessageHandler {
   public void recipient(String pRecipient)
   throws RejectException {
     try {
-      mEmailMessage.addRecipient(pRecipient);
+      mEmailMessage.addRecipient(pRecipient.toLowerCase());
     }
     catch (InvalidRecipientException e) {
       mLogger.error("Email recipient has no configured database: " + pRecipient + ". " + mEmailMessage.toString());

@@ -169,7 +169,7 @@ public class SMTPConfig {
         if (lRecipientNode instanceof Element) {
           Element lRecipientElement = (Element) lRecipientNode;
 
-          String lDomain = getUniqueChildNodeText(lRecipientElement, "domain");
+          String lDomain = getUniqueChildNodeText(lRecipientElement, "domain").toLowerCase();
           String lDatabaseName = getUniqueChildNodeText(lRecipientElement, "database");
 
           if (!pDatabaseSet.contains(lDatabaseName)) {

@@ -14,7 +14,7 @@ public enum BindParams {
 
   private final String mParamText;
 
-  private BindParams(String pParamText){
+  BindParams(String pParamText){
     mParamText = pParamText;
   }
 

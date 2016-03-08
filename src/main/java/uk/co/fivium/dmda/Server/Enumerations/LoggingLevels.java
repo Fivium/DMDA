@@ -7,7 +7,7 @@ public enum LoggingLevels {
 
   private final String mLevel;
 
-  private LoggingLevels(String pLevel) {
+  LoggingLevels(String pLevel) {
     mLevel = pLevel;
   }
 

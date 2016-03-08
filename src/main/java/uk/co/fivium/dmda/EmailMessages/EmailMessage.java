@@ -44,12 +44,12 @@ public class EmailMessage {
   private String mRemoteHostname;
 
   public EmailMessage(String pMailId) {
-    mRecipients = new ArrayList<String>();
+    mRecipients = new ArrayList<>();
     mSMTPConfig = SMTPConfig.getInstance();
     mAVScanner = AVScannerFactory.getScanner();
     mData = new byte[0];
     mMailId = pMailId;
-    mHeaderMap = new HashMap<String, String>();
+    mHeaderMap = new HashMap<>();
   }
 
   /**
@@ -100,17 +100,14 @@ public class EmailMessage {
     }
 
     lData = new byte[lBytesRead];
-    for (int i = 0; i < lBytesRead; i++){
-      lData[i] = lUntrimmedData[i];
-    }
+    System.arraycopy(lUntrimmedData, 0, lData, 0, lBytesRead);
 
     return lData;
   }
 
   private void readMessageBody(){
-    MimeMessage lMimeMessage = null;
     try {
-      lMimeMessage = new MimeMessage(
+      MimeMessage lMimeMessage = new MimeMessage(
         null // The session is not required as we're not passing the email on
       , new ByteArrayInputStream(mData) // Can't use the data stream as it's read once
       );
@@ -230,25 +227,17 @@ public class EmailMessage {
    */
   @Override
   public String toString() {
-    StringBuilder lMessageDetailStringBuilder = new StringBuilder();
-
-    lMessageDetailStringBuilder.append("Email Details: <from: ");
-    lMessageDetailStringBuilder.append(mFrom);
-    lMessageDetailStringBuilder.append("(" + mRemoteAddress + ")");
-
-    lMessageDetailStringBuilder.append("; To: ");
-    lMessageDetailStringBuilder.append(mRecipients.toString());
-
-    lMessageDetailStringBuilder.append("; Size: ");
-    lMessageDetailStringBuilder.append(getMessageBodySize2dp());
-    lMessageDetailStringBuilder.append("MB");
-
-    lMessageDetailStringBuilder.append("; Subject: ");
-    lMessageDetailStringBuilder.append(mSubject);
-
-    lMessageDetailStringBuilder.append(">");
-
-    return lMessageDetailStringBuilder.toString();
+    return "Email Details: <from: " +
+      mFrom +
+      "(" + mRemoteAddress + ")" +
+      "; To: " +
+      mRecipients.toString() +
+      "; Size: " +
+      getMessageBodySize2dp() +
+      "MB" +
+      "; Subject: " +
+      mSubject +
+      ">";
   }
 
   public String getMailId() {

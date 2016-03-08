@@ -32,8 +32,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Singleton for parsing and holding configuration data for DMDA
+ */
 public class SMTPConfig {
-  public static final int BYTES_IN_MEGABYTE = 1000000;
+  public static final int BYTES_IN_MEGABYTE = 1000 * 1000;
 
   private static final SMTPConfig gSMTPConfig  = new SMTPConfig();
 
@@ -108,8 +111,8 @@ public class SMTPConfig {
 
   private HashMap<String, DatabaseConnectionDetails> parseConnectionDet(Document pRootDoc)
   throws ConfigurationException {
-    HashMap<String, DatabaseConnectionDetails> lConnectionDetailsHashMap = new HashMap<String, DatabaseConnectionDetails>();
-    NodeList lDatabaseNodeList = null;
+    HashMap<String, DatabaseConnectionDetails> lConnectionDetailsHashMap = new HashMap<>();
+    NodeList lDatabaseNodeList;
     try {
       lDatabaseNodeList = (NodeList) mXPath.evaluate("/*/database_list/database", pRootDoc.getDocumentElement(), XPathConstants.NODESET);
       for (int i = 0; i < lDatabaseNodeList.getLength(); i++){
@@ -161,7 +164,7 @@ public class SMTPConfig {
 
   private HashMap<String, String> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
   throws ConfigurationException {
-    HashMap<String, String> lRecipientDatabaseMap = new HashMap<String, String>();
+    HashMap<String, String> lRecipientDatabaseMap = new HashMap<>();
 
     try {
       NodeList lRecipientNodeList = (NodeList) mXPath.evaluate("/*/recipient_list/recipient", pRootDoc.getDocumentElement(), XPathConstants.NODESET);
@@ -303,7 +306,7 @@ public class SMTPConfig {
   private Element getUniqueChildElements(Element pElement, String pChildTagName)
   throws ConfigurationException {
     XPath lXPath = XPathFactory.newInstance().newXPath();
-    NodeList lChildNodes = null;
+    NodeList lChildNodes;
     try {
       lChildNodes = (NodeList) lXPath.evaluate("./" + pChildTagName, pElement, XPathConstants.NODESET);
     }
@@ -337,7 +340,7 @@ public class SMTPConfig {
   /**
    * Returns the database configured for the given destination domain
    *
-   * @param pDestinationDomain
+   * @param pDestinationDomain Domain that maps to a database
    * @return the database configured for the given destination domain
    */
   public String getDatabaseForRecipient(String pDestinationDomain) {
@@ -356,7 +359,7 @@ public class SMTPConfig {
   /**
    * Returns the connection details for the given database name
    *
-   * @param pDatabaseName
+   * @param pDatabaseName Name of database to get connection details for
    * @return the connection details for the given database name
    */
   public DatabaseConnectionDetails getConnectionDetailsForDatabase(String pDatabaseName) {
@@ -366,7 +369,7 @@ public class SMTPConfig {
   /**
    * Get the connection details for the given recipient's domain
    *
-   * @param pRecipientDomain
+   * @param pRecipientDomain Domain mapping to database connection details
    * @return the connection details for the given recipient's domain
    */
   public DatabaseConnectionDetails getConnectionDetailsForRecipient(String pRecipientDomain){

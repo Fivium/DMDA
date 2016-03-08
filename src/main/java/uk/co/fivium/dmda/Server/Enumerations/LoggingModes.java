@@ -6,7 +6,8 @@ public enum LoggingModes {
   , NONE("none");
 
   private final String mMode;
-  private LoggingModes(String pMode){
+
+  LoggingModes(String pMode){
     mMode = pMode;
   }
 

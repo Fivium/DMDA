@@ -13,39 +13,23 @@ The main goals of this tool were:
 - Data integrity: The tool will either reject an email or store it. There will be no dropped emails.
 - Light weight: The tool is small, fast and easy to configure.
 
-
-Installation
---------------------------------------
-Redhat/CentOS:
-
-- Download dmda-x.x-x.x86_64.rpm from the releases page
-- yum localinstall dmda-x.x-x.x86_64.rpm
-
-Other sysv (initd) distributions:
-
-- Build or download the jar
-- Download dmdad and config.xml.example
-- Put these files in /opt/dmda
-- ln -s /opt/dmda/dmdad /etc/init.d
-
 Use
 --------------------------------------
-dmdad implements the basic service commands which can be invoked "service dmdad command":
+See the bin folder for creating a linux daemon for DMDA or see the releases page for an RPM distribution.
+Instructions on daemon installation and running can be found inside the bin folders [README](bin/README.md).
 
-- start - Starts the service. It will report if the server started successfully but might not wait until the server 
-  connects to the database. It's always worth checking the logs to see if all the connection pools for your databases 
-  have started up correctly.
-- stop - Stops the service if it is started.
-- restart - stops and restarts the service. There will be a few seconds of downtime.
+For local running run `mvn install` first and have a config.xml (see the config.xml.sample for information) in the 
+folder you run the following command:
+
+`java -jar ./target/dmda-x.x-SNAPSHOT-jar-with-dependencies.jar`
+
 
 Requirements
 --------------------------------------
-
 - Java : >=1.8
 
 Building
 --------------------------------------
-
 Due to Oracle licensing terms DMDA cannot re-distribute the Oracle JDBC jar files needed for building DMDA.
 Instead you need to have a valid Oracle Database install to get the Oracle JDBC jar available in the following 
 location, depending upon Oracle version:

@@ -54,7 +54,9 @@ unlink /etc/init.d/dmdad
 
 
 %pre
-unlink /etc/init.d/dmdad
+if [ -L /etc/init.d/dmdad ];then
+ unlink /etc/init.d/dmdad
+fi
 
 
 %post

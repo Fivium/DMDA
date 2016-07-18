@@ -2,8 +2,11 @@ package uk.co.fivium.dmda.Server;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import uk.co.fivium.dmda.AntiVirus.AVScannerFactory;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionException;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionHandler;
+
+import java.io.IOException;
 
 public class SMTPStart {
   public static void main(String[] args) {
@@ -16,9 +19,9 @@ public class SMTPStart {
       }
     };
     lShutdownHook.setName("Shutdown Hook");
+    Runtime.getRuntime().addShutdownHook(lShutdownHook);
 
     lSMTPStart.start();
-    Runtime.getRuntime().addShutdownHook(lShutdownHook);
   }
 
   public void start(){
@@ -44,6 +47,13 @@ public class SMTPStart {
     }
     catch (DatabaseConnectionException ex) {
       throw new ServerStartupException("Failed to create database connection pools", ex);
+    }
+
+    try{
+      AVScannerFactory.getScanner().testConnection();
+    }
+    catch (IOException ex) {
+      throw new ServerStartupException("Failed to connect to anti-virus scanner", ex);
     }
 
     SMTPServerWrapper lServer = new SMTPServerWrapper();

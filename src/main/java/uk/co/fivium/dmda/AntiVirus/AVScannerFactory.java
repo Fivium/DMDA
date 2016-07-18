@@ -9,7 +9,17 @@ public class AVScannerFactory {
    *
    * @return Returns an AV scanner
    */
+
+  private static AVScanner mAVScanner;
   public static AVScanner getScanner() {
+    if (mAVScanner == null){
+      mAVScanner = getNewScanner();
+    }
+
+    return mAVScanner;
+  }
+
+  private static AVScanner getNewScanner() {
     SMTPConfig lConf = SMTPConfig.getInstance();
     String lScannerMode = lConf.getAVMode();
     if (AVModes.CLAM.getText().equals(lScannerMode.toLowerCase())) {

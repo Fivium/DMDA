@@ -1,6 +1,6 @@
-Database Mail Delivery Agent
-==================================================
-DMDA is a Java application used to store email in a database. It is designed to sit behind a Mail Transfer Agent such 
+![DMDA](https://raw.githubusercontent.com/Fivium/DMDA/master/dmda-logo.png)
+
+DMDA (Database Mail Delivery Agent) is a Java application used to store email in a database. It is designed to sit behind a Mail Transfer Agent such 
 as postfix and will store emails in the configured databases based on the recipient's email address's domain. 
 
 This application was developed as an alternative for Apache James. James is a large POP3/IMAP server that does a lot of 

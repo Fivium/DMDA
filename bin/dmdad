@@ -6,7 +6,7 @@
 
 DAEMON_PATH="/opt/dmda"
 
-DAEMON="java -jar /opt/dmda/dmda.jar"
+DAEMON="java -jar /opt/dmda/dmda.jar -xms256m -xmx256m -server"
 NAME=dmdad
 DESC="Database Mail Delivery Agent"
 PIDFILE=/var/run/$NAME.pid

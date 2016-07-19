@@ -1,6 +1,5 @@
 package uk.co.fivium.dmda.Server;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -56,25 +55,6 @@ public class SMTPConfig {
 
   public boolean isValidRecipient(String lRecipientDomain) {
     return getDatabaseForRecipient(lRecipientDomain) != null;
-  }
-
-  private class DomainMatcher{
-    private String mDomain;
-    private boolean mRegex;
-    private String mDatabase;
-    public DomainMatcher(String pDomain , boolean pRegex, String pDatebase){
-      mDomain  = pDomain;
-      mRegex = pRegex;
-      mDatabase = pDatebase;
-    }
-
-    public boolean match(String pDomain){
-      return mRegex ? Pattern.matches(mDomain, pDomain) : pDomain.equals(mDomain);
-    }
-
-    public String getDatabase(){
-      return mDatabase;
-    }
   }
 
   public static SMTPConfig getInstance() {

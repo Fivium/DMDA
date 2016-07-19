@@ -67,5 +67,13 @@ INSERT INTO inbox(
       <domain>localhost</domain>
       <database>database_name</database>
     </recipient>
+    <recipient>
+      <!--
+      here the domain will be matched using a regular expression. Recipient domains will be matched against recipients
+      in the order they are defined here. The first match will be used.
+      -->
+      <regex_domain>.*\..*\.co.uk</regex_domain>
+      <database>database_name</database>
+    </recipient>
   </recipient_list>
 </smtp_config>

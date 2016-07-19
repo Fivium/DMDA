@@ -1,5 +1,6 @@
 package uk.co.fivium.dmda.Server;
 
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -25,10 +26,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,8 +42,8 @@ public class SMTPConfig {
   private int mSmtpPort;
   private String mLoggingLevel;
   private String mLoggingMode;
-  private HashMap<String, String> mRecipientDatabaseMapping;
-  private HashMap<String, DatabaseConnectionDetails> mDatabaseConnectionDetailsMap;
+  private List<DomainMatcher> mRecipientDatabaseMapping;
+  private Map<String, DatabaseConnectionDetails> mDatabaseConnectionDetailsMap;
   private String mEmailRejectionMessage;
   private String mAVMode;
   private String mAVServer;
@@ -55,6 +53,29 @@ public class SMTPConfig {
 
   // Make this a singleton
   private SMTPConfig(){}
+
+  public boolean isValidRecipient(String lRecipientDomain) {
+    return getDatabaseForRecipient(lRecipientDomain) != null;
+  }
+
+  private class DomainMatcher{
+    private String mDomain;
+    private boolean mRegex;
+    private String mDatabase;
+    public DomainMatcher(String pDomain , boolean pRegex, String pDatebase){
+      mDomain  = pDomain;
+      mRegex = pRegex;
+      mDatabase = pDatebase;
+    }
+
+    public boolean match(String pDomain){
+      return mRegex ? Pattern.matches(mDomain, pDomain) : pDomain.equals(mDomain);
+    }
+
+    public String getDatabase(){
+      return mDatabase;
+    }
+  }
 
   public static SMTPConfig getInstance() {
     return gSMTPConfig;
@@ -96,7 +117,7 @@ public class SMTPConfig {
 
   private void loadAVConfig(Element pRootElement)
   throws ConfigurationException {
-    Element lAVConfig = getUniqueChildElements(pRootElement, "anti_virus");
+    Element lAVConfig = getUniqueChildElement(pRootElement, "anti_virus");
     mAVMode = getUniqueChildNodeText(lAVConfig, "mode");
 
     if (AVModes.CLAM.getText().equals(mAVMode)) {
@@ -162,9 +183,9 @@ public class SMTPConfig {
     }
   }
 
-  private HashMap<String, String> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
+  private List<DomainMatcher> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
   throws ConfigurationException {
-    HashMap<String, String> lRecipientDatabaseMap = new HashMap<>();
+    List<DomainMatcher> lRecipientDatabaseMap = new ArrayList<>();
 
     try {
       NodeList lRecipientNodeList = (NodeList) mXPath.evaluate("/*/recipient_list/recipient", pRootDoc.getDocumentElement(), XPathConstants.NODESET);
@@ -174,18 +195,36 @@ public class SMTPConfig {
         if (lRecipientNode instanceof Element) {
           Element lRecipientElement = (Element) lRecipientNode;
 
-          String lDomain = getUniqueChildNodeText(lRecipientElement, "domain").toLowerCase();
           String lDatabaseName = getUniqueChildNodeText(lRecipientElement, "database");
+
+          String lDomain;
+          boolean lIsRegexDomain;
+
+          XPath lXPath = XPathFactory.newInstance().newXPath();
+          Node lDomainNode = (Node) lXPath.evaluate("./domain", lRecipientElement, XPathConstants.NODE);
+          Node lDomainRegexNode = (Node) lXPath.evaluate("./domain_regex", lRecipientElement, XPathConstants.NODE);
+
+          if (lDomainNode != null && lDomainRegexNode == null){
+            lDomain = lDomainNode.getTextContent();
+            lIsRegexDomain = false;
+          } else if (lDomainRegexNode != null && lDomainNode == null) {
+            lDomain = lDomainRegexNode.getTextContent();
+            lIsRegexDomain = true;
+          } else {
+            throw new ConfigurationException("Only one of domain or domain_regex elements may be declared inside a recipient");
+          }
 
           if (!pDatabaseSet.contains(lDatabaseName)) {
             throw new ConfigurationException("Unknown database " + lDatabaseName);
           }
 
-          if (lRecipientDatabaseMap.containsKey(lDomain)){
-            throw new ConfigurationException("Duplicate recipient " + lDomain);
+          for (DomainMatcher lDomainMatcher : lRecipientDatabaseMap){
+            if (lDomain.equals(lDomainMatcher.getDatabase())){
+              throw new ConfigurationException("Duplicate recipient " + lDomain);
+            }
           }
 
-          lRecipientDatabaseMap.put(lDomain, lDatabaseName);
+          lRecipientDatabaseMap.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName));
         }
         else {
           throw new ConfigurationException("Invalid recipient XML");
@@ -292,7 +331,7 @@ public class SMTPConfig {
    */
   private String getUniqueChildNodeText(Element pElement, String pChildTagName)
   throws ConfigurationException {
-    return getUniqueChildElements(pElement, pChildTagName).getTextContent();
+    return getUniqueChildElement(pElement, pChildTagName).getTextContent();
   }
 
   /**
@@ -303,7 +342,7 @@ public class SMTPConfig {
    * @return the text content of the child node
    * @throws ConfigurationException
    */
-  private Element getUniqueChildElements(Element pElement, String pChildTagName)
+  private Element getUniqueChildElement(Element pElement, String pChildTagName)
   throws ConfigurationException {
     XPath lXPath = XPathFactory.newInstance().newXPath();
     NodeList lChildNodes;
@@ -340,11 +379,16 @@ public class SMTPConfig {
   /**
    * Returns the database configured for the given destination domain
    *
-   * @param pDestinationDomain Domain that maps to a database
+   * @param pRecipientDomain Domain that maps to a database
    * @return the database configured for the given destination domain
    */
-  public String getDatabaseForRecipient(String pDestinationDomain) {
-    return mRecipientDatabaseMapping.get(pDestinationDomain);
+  public String getDatabaseForRecipient(String pRecipientDomain) {
+    for (DomainMatcher lMatcher : mRecipientDatabaseMapping){
+      if(lMatcher.match(pRecipientDomain)){
+        return lMatcher.getDatabase();
+      }
+    }
+    return null;
   }
 
   /**
@@ -372,9 +416,8 @@ public class SMTPConfig {
    * @param pRecipientDomain Domain mapping to database connection details
    * @return the connection details for the given recipient's domain
    */
-  public DatabaseConnectionDetails getConnectionDetailsForRecipient(String pRecipientDomain){
-    String lDatabase = mRecipientDatabaseMapping.get(pRecipientDomain);
-    return mDatabaseConnectionDetailsMap.get(lDatabase);
+  public DatabaseConnectionDetails getConnectionDetailsForRecipient(String pRecipientDomain) {
+    return getConnectionDetailsForDatabase(getDatabaseForRecipient(pRecipientDomain));
   }
 
   /**
@@ -382,9 +425,6 @@ public class SMTPConfig {
    *
    * @return A set of all configured recipients
    */
-  public Set<String> getRecipientSet() {
-    return mRecipientDatabaseMapping.keySet();
-  }
 
   public String getLoggingMode() {
     return mLoggingMode;

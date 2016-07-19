@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import uk.co.fivium.dmda.AntiVirus.AVScanner;
 import uk.co.fivium.dmda.AntiVirus.AVScannerFactory;
+import uk.co.fivium.dmda.Server.ConfigurationException;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 
 import javax.mail.Header;
@@ -191,12 +192,12 @@ public class EmailMessage {
   public void addRecipient(String pRecipient)
   throws InvalidRecipientException {
     String lRecipientDomain = pRecipient.substring(pRecipient.indexOf('@')+1);
-    if(mSMTPConfig.getRecipientSet().contains(lRecipientDomain)){
+    if(mSMTPConfig.isValidRecipient(lRecipientDomain)){
       mRecipients.add(pRecipient);
-    }
-    else {
+    } else {
       throw new InvalidRecipientException();
     }
+
   }
 
   public ArrayList<String> getRecipients() {

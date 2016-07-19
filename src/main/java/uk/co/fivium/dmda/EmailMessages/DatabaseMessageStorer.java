@@ -7,6 +7,7 @@ import org.subethamail.smtp.RejectException;
 import org.w3c.dom.Document;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionHandler;
+import uk.co.fivium.dmda.Server.ConfigurationException;
 import uk.co.fivium.dmda.Server.Enumerations.BindParams;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 
@@ -36,6 +37,7 @@ public class DatabaseMessageStorer implements MessageStorer{
 
   @Override
   public void storeMessage(EmailMessage pEmailMessage) {
+    //TODO look at unnesting these try and catch blocks
     for (String lRecipient : pEmailMessage.getRecipients()) {
       String lRecipientDomain = lRecipient.substring(lRecipient.indexOf('@')+1).toLowerCase();
       String lRepository = lRecipient.substring(0, lRecipient.indexOf('@'));
@@ -72,7 +74,6 @@ public class DatabaseMessageStorer implements MessageStorer{
             lStatement.setStringForClobAtName(BindParams.HEADER_XML.getText(), "");
           }
         }
-
 
         lStatement.execute();
         lStatement.close();

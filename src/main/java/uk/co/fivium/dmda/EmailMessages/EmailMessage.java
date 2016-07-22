@@ -276,8 +276,4 @@ public class EmailMessage {
   public Date getSentDate() {
     return mSentDate;
   }
-
-  public int getSize(){
-    return mData.length;
-  }
 }

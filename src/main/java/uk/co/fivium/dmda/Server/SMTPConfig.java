@@ -66,11 +66,12 @@ public class SMTPConfig {
    * @throws ConfigurationException
    */
   // TODO make config reloadable (reload on receiving SIGUSR2?)
-  public void loadConfig(File pFile)
+  public void loadConfig()
   throws ConfigurationException {
     try {
+      File file = new File("config.xml");
       DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document lRootDoc = dBuilder.parse(pFile);
+      Document lRootDoc = dBuilder.parse(file);
       Element lRootElement = lRootDoc.getDocumentElement();
 
       mSmtpPort = getUniqueChildNodeInt(lRootElement, "port");

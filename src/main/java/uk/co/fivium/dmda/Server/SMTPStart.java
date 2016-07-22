@@ -5,17 +5,20 @@ import org.apache.log4j.Logger;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionException;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionHandler;
 
-import java.io.File;
-
 public class SMTPStart {
-  private SMTPServerWrapper mSMTPServer;
-
   public static void main(String[] args) {
-    SMTPStart lSMTPStart = new SMTPStart();
-    Thread lShutdownHook = new Thread(lSMTPStart::stop);
+    final SMTPStart lSMTPStart = new SMTPStart();
+
+    Thread lShutdownHook = new Thread(){
+      @Override
+      public void run() {
+        lSMTPStart.stop();
+      }
+    };
     lShutdownHook.setName("Shutdown Hook");
-    Runtime.getRuntime().addShutdownHook(lShutdownHook);
+
     lSMTPStart.start();
+    Runtime.getRuntime().addShutdownHook(lShutdownHook);
   }
 
   public void start(){
@@ -31,7 +34,6 @@ public class SMTPStart {
 
   public void stop() {
     DatabaseConnectionHandler.getInstance().shutDown();
-    mSMTPServer.stop();
     Logger.getRootLogger().info("Shutdown signal received. Server shutting down.");
   }
 
@@ -44,14 +46,14 @@ public class SMTPStart {
       throw new ServerStartupException("Failed to create database connection pools", ex);
     }
 
-    mSMTPServer = new SMTPServerWrapper();
-    mSMTPServer.start();
+    SMTPServerWrapper lServer = new SMTPServerWrapper();
+    lServer.start();
   }
 
   private void loadServerConfiguration()
   throws ServerStartupException {
     try {
-      SMTPConfig.getInstance().loadConfig(new File("config.xml"));
+      SMTPConfig.getInstance().loadConfig();
     }
     catch (ConfigurationException ex) {
       throw new ServerStartupException("Failed to load server configuration", ex);

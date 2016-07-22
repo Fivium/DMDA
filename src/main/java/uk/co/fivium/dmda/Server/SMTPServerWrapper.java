@@ -11,7 +11,6 @@ import uk.co.fivium.dmda.EmailMessages.DatabaseMessageStorer;
 */
 public class SMTPServerWrapper {
   private SMTPConfig mSMTPConfig;
-  private SMTPServer mSMTPServer;
 
   public SMTPServerWrapper(){
     mSMTPConfig = SMTPConfig.getInstance();
@@ -23,12 +22,8 @@ public class SMTPServerWrapper {
       DatabaseMessageStorer lMessageStorer = new DatabaseMessageStorer();
       return new DatabaseMessageHandler(lMessageStorer, pMessageContext);
     };
-    mSMTPServer = new SMTPServer(lMessageHandlerFactory);
-    mSMTPServer.setPort(mSMTPConfig.getSmtpPort());
-    mSMTPServer.start();
-  }
-
-  public void stop(){
-    mSMTPServer.stop();
+    SMTPServer lSMTPServer = new SMTPServer(lMessageHandlerFactory);
+    lSMTPServer.setPort(mSMTPConfig.getSmtpPort());
+    lSMTPServer.start();
   }
 }

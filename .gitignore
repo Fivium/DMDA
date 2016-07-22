@@ -58,4 +58,4 @@ crashlytics.properties
 crashlytics-build.properties
 
 #DMDA files
-config.xml
+/config.xml

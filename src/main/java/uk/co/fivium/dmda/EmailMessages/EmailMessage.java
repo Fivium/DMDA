@@ -1,6 +1,7 @@
 package uk.co.fivium.dmda.EmailMessages;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.lf5.util.StreamUtils;
 import org.subethamail.smtp.MessageContext;
 import org.subethamail.smtp.RejectException;
 import org.w3c.dom.Document;
@@ -11,9 +12,13 @@ import uk.co.fivium.dmda.AntiVirus.AVScannerFactory;
 import uk.co.fivium.dmda.Server.ConfigurationException;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 
+import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -33,8 +39,9 @@ public class EmailMessage {
   private String mSubject;
   private String mFrom;
   private String mRemoteAddress;
-  private ArrayList<String> mRecipients;
+  private ArrayList<EmailRecipient> mRecipients;
   private byte[] mData;
+  private ArrayList<Attachment> mAttachments;
   private HashMap<String, String> mHeaderMap;
   private Document mHeaderXML;
   private Date mSentDate;
@@ -46,6 +53,7 @@ public class EmailMessage {
 
   public EmailMessage(String pMailId) {
     mRecipients = new ArrayList<>();
+    mAttachments = new ArrayList<>();
     mSMTPConfig = SMTPConfig.getInstance();
     mAVScanner = AVScannerFactory.getScanner();
     mData = new byte[0];
@@ -130,11 +138,63 @@ public class EmailMessage {
           throw new MessagingException("Error decoding header " + lName, ex);
         }
       }
+
+      stripAttachments(lMimeMessage);
     }
-    catch (MessagingException ex) {
+    catch (MessagingException|IOException ex) {
       mLogger.error("Messaging exception reading message body - " + toString(), ex);
       throw new RejectException();
     }
+  }
+
+  private void stripAttachments(MimeMessage pMimeMessage) throws IOException, MessagingException {
+    Object lContent = pMimeMessage.getContent();
+
+
+    // Check if the email is multi-part or not
+    if (lContent instanceof String || lContent instanceof InputStream) {
+      Attachment lAttachment = processMimePart(pMimeMessage);
+      mAttachments.add(lAttachment);
+    }
+    // If it is multi-part, strip the parts out into attachments
+    else if (lContent instanceof MimeMultipart){
+      MimeMultipart lMimeMultipart = (MimeMultipart) lContent;
+
+      for(int i = 0; i < lMimeMultipart.getCount(); i++){
+        BodyPart lBodyPart = lMimeMultipart.getBodyPart(i);
+
+        processMimePart(lBodyPart);
+
+        mAttachments.add(processMimePart(lBodyPart));
+      }
+    }
+  }
+
+  private Attachment processMimePart(Part pPart) throws IOException, MessagingException {
+    Object lContent = pPart.getContent();
+    Attachment lAttachment = new Attachment();
+
+    lAttachment.setContentType(pPart.getContentType());
+    lAttachment.setFileName(pPart.getFileName());
+    lAttachment.setDisposition(pPart.getDisposition());
+
+    if (lContent instanceof String){
+      String lStringContent = (String) lContent;
+      lAttachment.setTextContent(lStringContent);
+      lAttachment.setData(lStringContent.getBytes());
+    } else if (lContent instanceof InputStream) {
+      InputStream lDataStream = (InputStream) lContent;
+      byte[] lData = StreamUtils.getBytes(lDataStream);
+      lAttachment.setData(lData);
+    } else {
+      /* Message attachments could be multi part themselves or be another message entirely. For our purposes, we don't
+       * need to handle these cases.
+       */
+      lAttachment.setData(StreamUtils.getBytes(pPart.getInputStream()));
+      mLogger.warn("Email has a nested attachment which is not implemented yet" + toString());
+    }
+
+    return lAttachment;
   }
 
   private void buildHeaderXML()
@@ -186,21 +246,22 @@ public class EmailMessage {
   /**
    * Adds the recipient to the email message. Will check that it is a configured recipient.
    *
-   * @param pRecipient The recipient email address
+   * @param pRecipientEmail The recipient email address
    * @throws InvalidRecipientException
    */
-  public void addRecipient(String pRecipient)
+  public void addRecipient(String pRecipientEmail)
   throws InvalidRecipientException {
-    String lRecipientDomain = pRecipient.substring(pRecipient.indexOf('@')+1);
-    if(mSMTPConfig.isValidRecipient(lRecipientDomain)){
-      mRecipients.add(pRecipient);
+    EmailRecipient lEmailRecipient = new EmailRecipient(pRecipientEmail);
+
+    if(mSMTPConfig.isValidRecipient(lEmailRecipient.mDomain)){
+      mRecipients.add(lEmailRecipient);
     } else {
       throw new InvalidRecipientException();
     }
 
   }
 
-  public ArrayList<String> getRecipients() {
+  public ArrayList<EmailRecipient> getRecipients() {
     return mRecipients;
   }
 
@@ -278,7 +339,11 @@ public class EmailMessage {
     return mSentDate;
   }
 
-  public int getSize(){
+  public int getSize() {
     return mData.length;
+  }
+
+  public ArrayList<Attachment> getAttachments() {
+    return mAttachments;
   }
 }

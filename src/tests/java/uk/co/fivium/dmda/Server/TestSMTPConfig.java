@@ -61,11 +61,9 @@ public class TestSMTPConfig {
   public void testRecipientSet() {
     try {
       mConfig.loadConfig(TestUtil.getTestResourceFile("well_populated_config.xml", this.getClass()));
-      Set<String> set = mConfig.getRecipientSet();
-      assertEquals(set.size(), 4);
 
       for (int i = 1; i < 5; i++) {
-        assertTrue(set.contains(i + "exact.domain.co.uk"));
+        assertTrue(mConfig.isValidRecipient(i + "exact.domain.co.uk"));
       }
     } catch (ConfigurationException e) {
       fail("Good configuration failed to parse");

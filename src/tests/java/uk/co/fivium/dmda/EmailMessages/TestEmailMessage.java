@@ -29,9 +29,9 @@ public class TestEmailMessage {
       String lRecipient = "user1@exact.domain.co.uk";
       EmailMessage lMessage = new EmailMessage("mailid");
       lMessage.addRecipient(lRecipient);
-      ArrayList<String> lRecipients = lMessage.getRecipients();
+      ArrayList<EmailRecipient> lRecipients = lMessage.getRecipients();
       assertEquals(1, lRecipients.size());
-      assertEquals(lRecipient, lRecipients.get(0));
+      assertEquals(lRecipient, lRecipients.get(0).mEmailAdrress);
     } catch (InvalidRecipientException ex) {
       fail("Adding a valid recipient failed");
     }

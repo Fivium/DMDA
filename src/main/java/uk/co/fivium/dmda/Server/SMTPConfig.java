@@ -119,6 +119,7 @@ public class SMTPConfig {
           String lUsername = getUniqueChildNodeText(lDatabaseElement, "username");
           String lPassword = getUniqueChildNodeText(lDatabaseElement, "password");
           String lStoreQuery = getUniqueChildNodeText(lDatabaseElement, "store_query");
+          String lAttachmentStoreQuery = getUniqueChildNodeTextIfExists(lDatabaseElement, "attachment_store_query");
           String lDatabaseName = getUniqueChildNodeText(lDatabaseElement, "name");
 
           // Disallow duplicate database names
@@ -132,7 +133,7 @@ public class SMTPConfig {
           }
 
 
-          DatabaseConnectionDetails lConnectionDetails = new DatabaseConnectionDetails(lDatabaseName, lJdbcURL, lUsername, lPassword, lStoreQuery);
+          DatabaseConnectionDetails lConnectionDetails = new DatabaseConnectionDetails(lDatabaseName, lJdbcURL, lUsername, lPassword, lStoreQuery, lAttachmentStoreQuery);
           lConnectionDetailsHashMap.put(lDatabaseName, lConnectionDetails);
         } else {
           throw new ConfigurationException("Invalid database configuration XML");
@@ -319,6 +320,14 @@ public class SMTPConfig {
     return getUniqueChildElement(pElement, pChildTagName).getTextContent();
   }
 
+  private String getUniqueChildNodeTextIfExists(Element pElement, String pChildTagName){
+    try{
+      return getUniqueChildNodeText(pElement, pChildTagName);
+    } catch (ConfigurationException e) {
+      return null;
+    }
+  }
+
   /**
    * Fetches a child node
    *
@@ -393,16 +402,6 @@ public class SMTPConfig {
    */
   public DatabaseConnectionDetails getConnectionDetailsForDatabase(String pDatabaseName) {
     return mDatabaseConnectionDetailsMap.get(pDatabaseName);
-  }
-
-  /**
-   * Get the connection details for the given recipient's domain
-   *
-   * @param pRecipientDomain Domain mapping to database connection details
-   * @return the connection details for the given recipient's domain
-   */
-  public DatabaseConnectionDetails getConnectionDetailsForRecipient(String pRecipientDomain) {
-    return getConnectionDetailsForDatabase(getDatabaseForRecipient(pRecipientDomain));
   }
 
   /**

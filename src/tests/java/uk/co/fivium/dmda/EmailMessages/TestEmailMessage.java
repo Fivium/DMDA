@@ -2,14 +2,10 @@ package uk.co.fivium.dmda.EmailMessages;
 
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.co.fivium.dmda.Server.ConfigurationException;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 import uk.co.fivium.dmda.TestUtil;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
@@ -30,8 +26,8 @@ public class TestEmailMessage {
     mAttachments = lMessage.getAttachments();
   }
 
-  @BeforeClass
-  public static void loadConfig() throws ConfigurationException {
+  @Before
+  public void loadConfig() throws ConfigurationException {
     SMTPConfig.getInstance().loadConfig(TestUtil.getTestResourceFile("../config.xml", TestEmailMessage.class));
   }
 

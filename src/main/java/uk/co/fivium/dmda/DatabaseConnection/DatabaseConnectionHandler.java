@@ -61,7 +61,7 @@ public class DatabaseConnectionHandler {
    * @throws DatabaseConnectionException
    */
   public Connection getConnection(String pDestinationDomain)
-  throws DatabaseConnectionException {
+          throws DatabaseConnectionException {
     String lDatabaseName = mSMTPConfig.getDatabaseForRecipient(pDestinationDomain);
     try {
       HikariDataSource lDataSource = mDatabaseConnectionPoolMapping.get(lDatabaseName);

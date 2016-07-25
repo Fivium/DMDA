@@ -1,13 +1,8 @@
 package uk.co.fivium.dmda.Server;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.*;
 import org.apache.log4j.varia.NullAppender;
+import org.apache.log4j.xml.DOMConfigurator;
 import uk.co.fivium.dmda.AntiVirus.AVModes;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import org.w3c.dom.Document;
@@ -201,29 +196,40 @@ public class SMTPConfig {
   private void configureLoggingFromConfig()
   throws ConfigurationException {
     SMTPConfig lSMTPConfig = SMTPConfig.getInstance();
-    String lLoggingLevel = lSMTPConfig.getLoggingLevel();
     String lLoggingMode = lSMTPConfig.getLoggingMode();
-    Logger lRootLogger = Logger.getRootLogger();
-
-    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
-    Appender lAppender = new NullAppender();
 
     if (LoggingModes.FILE.getText().equals(lLoggingMode)){
       FileAppender lFileAppender = new FileAppender();
       lFileAppender.setFile("logs/dmda.log");
       lFileAppender.activateOptions();
-      lAppender = lFileAppender;
+      configureLoggingWithAppender(lFileAppender);
     }
     else if (LoggingModes.CONSOLE.getText().equals(lLoggingMode)){
-      lAppender = new ConsoleAppender(lLayout);
+      ConsoleAppender lConsoleAppender = new ConsoleAppender();
+      lConsoleAppender.activateOptions();
+      configureLoggingWithAppender(lConsoleAppender);
     }
     else if(!LoggingModes.NONE.getText().equals(lLoggingMode)){
-      throw new ConfigurationException("Invalid logger mode " + lLoggingMode);
+      if(lLoggingMode.endsWith(".xml")){
+        DOMConfigurator.configure(lLoggingMode);
+      } else if(lLoggingMode.endsWith(".properties")){
+        PropertyConfigurator.configure(lLoggingMode);
+      } else {
+        throw new ConfigurationException("Logging mode " + lLoggingMode + " is not a valid logging mode");
+      }
     }
+  }
 
-    lAppender.setLayout(lLayout);
+  private void configureLoggingWithAppender(Appender pAppender){
+    SMTPConfig lSMTPConfig = SMTPConfig.getInstance();
+    String lLoggingLevel = lSMTPConfig.getLoggingLevel();
+    Logger lRootLogger = Logger.getRootLogger();
+
+    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
+    pAppender.setLayout(lLayout);
+
     lRootLogger.removeAllAppenders();
-    lRootLogger.addAppender(lAppender);
+    lRootLogger.addAppender(pAppender);
 
     if (LoggingLevels.DEBUG.getText().equals(lLoggingLevel)) {
       lRootLogger.setLevel(Level.DEBUG);

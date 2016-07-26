@@ -41,7 +41,8 @@ public class TestEmailMessage {
       ArrayList<EmailRecipient> lRecipients = lMessage.getRecipients();
       assertEquals(1, lRecipients.size());
       assertEquals(lRecipient, lRecipients.get(0).mEmailAddress);
-    } catch (InvalidRecipientException ex) {
+    }
+    catch (InvalidRecipientException ex) {
       fail("Adding a valid recipient failed");
     }
   }
@@ -52,7 +53,8 @@ public class TestEmailMessage {
       EmailMessage lMessage = new EmailMessage("mailid");
       lMessage.addRecipient("user2@invalid.local");
       fail("Adding an invalid recipient succeeded");
-    } catch (InvalidRecipientException ex) {
+    }
+    catch (InvalidRecipientException ex) {
       // Failed as required
     }
   }

@@ -25,7 +25,8 @@ public class TestSMTPConfig {
   public void testLoadGoodConfig() {
     try {
       mConfig.loadConfig(TestUtil.getTestResourceFile("minimal_good_config.xml", this.getClass()));
-    } catch (ConfigurationException e) {
+    }
+    catch (ConfigurationException e) {
       // the good config should not fail
       fail("Good configuration failed to parse");
     }
@@ -36,7 +37,8 @@ public class TestSMTPConfig {
     try {
       mConfig.loadConfig(TestUtil.getTestResourceFile("no_database_config.xml", this.getClass()));
       fail("Bad configuration successfully parsed");
-    } catch (ConfigurationException e) {
+    }
+    catch (ConfigurationException e) {
       // this config should have failed
     }
   }
@@ -52,7 +54,8 @@ public class TestSMTPConfig {
       assertEquals(mConfig.getAVMode(), "clamd");
       assertEquals(mConfig.getAVServer(), "clamd_server");
       assertEquals(mConfig.getAVTimeoutMS(), 1000);
-    } catch (ConfigurationException e) {
+    }
+    catch (ConfigurationException e) {
       fail("Good configuration failed to parse");
     }
   }
@@ -65,7 +68,8 @@ public class TestSMTPConfig {
       for (int i = 1; i < 5; i++) {
         assertTrue(mConfig.isValidRecipient(i + "exact.domain.co.uk"));
       }
-    } catch (ConfigurationException e) {
+    }
+    catch (ConfigurationException e) {
       fail("Good configuration failed to parse");
     }
   }
@@ -80,7 +84,8 @@ public class TestSMTPConfig {
       testDatabaseDetails(1, lMapping);
       testDatabaseDetails(2, lMapping);
 
-    } catch (ConfigurationException e) {
+    }
+    catch (ConfigurationException e) {
       fail("Good configuration failed to parse");
     }
   }

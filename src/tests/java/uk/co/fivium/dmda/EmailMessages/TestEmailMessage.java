@@ -19,7 +19,8 @@ public class TestEmailMessage {
   ArrayList<Attachment> mAttachments;
 
   @Before
-  public void loadEMLs(){
+  public void loadEMLs() throws ConfigurationException {
+    SMTPConfig.getInstance().loadConfig(TestUtil.getTestResourceFile("../config.xml", this.getClass()));
     EmailMessage lMessage = new EmailMessage("mailid");
     lMessage.addData(TestUtil.getTestResourceStream("attachments.eml", this.getClass()));
 

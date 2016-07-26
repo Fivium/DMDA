@@ -182,11 +182,13 @@ public class EmailMessage {
       String lStringContent = (String) lContent;
       lAttachment.setTextContent(lStringContent);
       lAttachment.setData(lStringContent.getBytes());
-    } else if (lContent instanceof InputStream) {
+    }
+    else if (lContent instanceof InputStream) {
       InputStream lDataStream = (InputStream) lContent;
       byte[] lData = StreamUtils.getBytes(lDataStream);
       lAttachment.setData(lData);
-    } else {
+    }
+    else {
       /* Message attachments could be multi part themselves or be another message entirely. For our purposes, we don't
        * need to handle these cases.
        */
@@ -255,7 +257,8 @@ public class EmailMessage {
 
     if(mSMTPConfig.isValidRecipient(lEmailRecipient.mDomain)){
       mRecipients.add(lEmailRecipient);
-    } else {
+    }
+    else {
       throw new InvalidRecipientException();
     }
 

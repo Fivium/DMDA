@@ -128,14 +128,16 @@ public class SMTPConfig {
           }
           try {
             validateStoreQuery(lStoreQuery);
-          } catch (ConfigurationException ex) {
+          }
+          catch (ConfigurationException ex) {
             throw new ConfigurationException("Invalid store query string in database " + lDatabaseName, ex);
           }
 
 
           DatabaseConnectionDetails lConnectionDetails = new DatabaseConnectionDetails(lDatabaseName, lJdbcURL, lUsername, lPassword, lStoreQuery, lAttachmentStoreQuery);
           lConnectionDetailsHashMap.put(lDatabaseName, lConnectionDetails);
-        } else {
+        }
+        else {
           throw new ConfigurationException("Invalid database configuration XML");
         }
       }
@@ -182,10 +184,12 @@ public class SMTPConfig {
           if (lDomainNode != null && lDomainRegexNode == null){
             lDomain = lDomainNode.getTextContent();
             lIsRegexDomain = false;
-          } else if (lDomainRegexNode != null && lDomainNode == null) {
+          }
+          else if (lDomainRegexNode != null && lDomainNode == null) {
             lDomain = lDomainRegexNode.getTextContent();
             lIsRegexDomain = true;
-          } else {
+          }
+          else {
             throw new ConfigurationException("Only one of domain or domain_regex elements may be declared inside a recipient");
           }
 
@@ -232,9 +236,11 @@ public class SMTPConfig {
     else if(!LoggingModes.NONE.getText().equals(lLoggingMode)){
       if(lLoggingMode.endsWith(".xml")){
         DOMConfigurator.configure(lLoggingMode);
-      } else if(lLoggingMode.endsWith(".properties")){
+      }
+      else if(lLoggingMode.endsWith(".properties")){
         PropertyConfigurator.configure(lLoggingMode);
-      } else {
+      }
+      else {
         throw new ConfigurationException("Logging mode " + lLoggingMode + " is not a valid logging mode");
       }
     }

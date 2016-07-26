@@ -57,10 +57,12 @@ public class DatabaseMessageStorer implements MessageStorer{
 
         lOracleConnection.commit();
 
-      } catch (SQLException ex) {
+      }
+      catch (SQLException ex) {
         mLogger.error("Error storing email in database " + lConnectionDetails.toString(), ex);
         throw new RejectException();
-      } finally {
+      }
+      finally {
         try {
           if (lConnection != null){
             lConnection.close();
@@ -95,7 +97,8 @@ public class DatabaseMessageStorer implements MessageStorer{
     if (pStoreQuery.contains(":" + BindParams.HEADER_XML.getText())) {
       try {
         setXMLTypeAtName(pStatement, BindParams.HEADER_XML.getText(), pEmailMessage.getHeadersXML());
-      } catch (ParserConfigurationException ex) {
+      }
+      catch (ParserConfigurationException ex) {
         // TODO look into a more sensible behavior for this case
         mLogger.error("Error building header XML, defaulting to null", ex);
         pStatement.setStringForClobAtName(BindParams.HEADER_XML.getText(), "");

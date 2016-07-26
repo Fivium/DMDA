@@ -64,7 +64,7 @@ ln -s /opt/dmda/dmdad /etc/init.d/dmdad
 
 
 %changelog
-* Tu Jul 26 2016 Jonathan Poole <jon.poole@fivium.co.uk> - 1.4
+* Tue Jul 26 2016 Jonathan Poole <jon.poole@fivium.co.uk> - 1.4
 - Attachment stripping, domain wildcards, configuration enhancements and bug fixes
 * Tue Mar 08 2016 Nick Palmer <nick.palmer-mills@fivium.co.uk> - 1.3
 - Added a /smtp_config/anti_virus/timeout_ms config property so the timeout on the response from ClamAV can be defined.

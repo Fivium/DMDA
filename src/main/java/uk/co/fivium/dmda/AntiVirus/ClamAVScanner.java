@@ -24,4 +24,11 @@ public class ClamAVScanner implements AVScanner {
     return ClamAVClient.isCleanReply(lReply);
   }
 
+  @Override
+  public void testConnection() throws IOException {
+    if(!mClamAVClient.ping()){
+      throw new IOException("Ping to CLAM server failed. Are the connection details correct?");
+    }
+  }
+
 }

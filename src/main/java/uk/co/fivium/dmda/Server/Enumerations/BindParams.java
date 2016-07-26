@@ -2,7 +2,7 @@ package uk.co.fivium.dmda.Server.Enumerations;
 
 public enum BindParams {
     MAIL_ID("mail_id")
-  , REPOSITORY("repository")
+  , USER("repository")
   , FROM("from_address")
   , RECIPIENT("recipient")
   , REMOTE_HOSTNAME("remote_hostname")
@@ -10,7 +10,13 @@ public enum BindParams {
   , MESSAGE_BODY("message_body")
   , SUBJECT("subject")
   , HEADER_XML("header_xml_clob")
-  , SENT_DATE("sent_date");
+  , SENT_DATE("sent_date")
+  // Attachment Params
+  , FILE_NAME("file_name")
+  , CONTENT_TYPE("content_type")
+  , CONTENT_DATA("content_data")
+  , TEXT_CONTENT("text_content")
+  , CONTENT_DISPOSITION("content_disposition");
 
   private final String mParamText;
 

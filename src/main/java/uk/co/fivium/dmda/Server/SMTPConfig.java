@@ -1,13 +1,8 @@
 package uk.co.fivium.dmda.Server;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.*;
 import org.apache.log4j.varia.NullAppender;
+import org.apache.log4j.xml.DOMConfigurator;
 import uk.co.fivium.dmda.AntiVirus.AVModes;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import org.w3c.dom.Document;
@@ -25,10 +20,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,8 +36,8 @@ public class SMTPConfig {
   private int mSmtpPort;
   private String mLoggingLevel;
   private String mLoggingMode;
-  private HashMap<String, String> mRecipientDatabaseMapping;
-  private HashMap<String, DatabaseConnectionDetails> mDatabaseConnectionDetailsMap;
+  private List<DomainMatcher> mRecipientDatabaseMapping;
+  private Map<String, DatabaseConnectionDetails> mDatabaseConnectionDetailsMap;
   private String mEmailRejectionMessage;
   private String mAVMode;
   private String mAVServer;
@@ -56,6 +48,10 @@ public class SMTPConfig {
   // Make this a singleton
   private SMTPConfig(){}
 
+  public boolean isValidRecipient(String lRecipientDomain) {
+    return getDatabaseForRecipient(lRecipientDomain) != null;
+  }
+
   public static SMTPConfig getInstance() {
     return gSMTPConfig;
   }
@@ -65,13 +61,11 @@ public class SMTPConfig {
    *
    * @throws ConfigurationException
    */
-  // TODO make config reloadable (reload on receiving SIGUSR2?)
-  public void loadConfig()
+  public void loadConfig(File pFile)
   throws ConfigurationException {
     try {
-      File file = new File("config.xml");
       DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document lRootDoc = dBuilder.parse(file);
+      Document lRootDoc = dBuilder.parse(pFile);
       Element lRootElement = lRootDoc.getDocumentElement();
 
       mSmtpPort = getUniqueChildNodeInt(lRootElement, "port");
@@ -96,7 +90,7 @@ public class SMTPConfig {
 
   private void loadAVConfig(Element pRootElement)
   throws ConfigurationException {
-    Element lAVConfig = getUniqueChildElements(pRootElement, "anti_virus");
+    Element lAVConfig = getUniqueChildElement(pRootElement, "anti_virus");
     mAVMode = getUniqueChildNodeText(lAVConfig, "mode");
 
     if (AVModes.CLAM.getText().equals(mAVMode)) {
@@ -124,6 +118,7 @@ public class SMTPConfig {
           String lUsername = getUniqueChildNodeText(lDatabaseElement, "username");
           String lPassword = getUniqueChildNodeText(lDatabaseElement, "password");
           String lStoreQuery = getUniqueChildNodeText(lDatabaseElement, "store_query");
+          String lAttachmentStoreQuery = getUniqueChildNodeTextIfExists(lDatabaseElement, "attachment_store_query");
           String lDatabaseName = getUniqueChildNodeText(lDatabaseElement, "name");
 
           // Disallow duplicate database names
@@ -132,14 +127,16 @@ public class SMTPConfig {
           }
           try {
             validateStoreQuery(lStoreQuery);
-          } catch (ConfigurationException ex) {
+          }
+          catch (ConfigurationException ex) {
             throw new ConfigurationException("Invalid store query string in database " + lDatabaseName, ex);
           }
 
 
-          DatabaseConnectionDetails lConnectionDetails = new DatabaseConnectionDetails(lDatabaseName, lJdbcURL, lUsername, lPassword, lStoreQuery);
+          DatabaseConnectionDetails lConnectionDetails = new DatabaseConnectionDetails(lDatabaseName, lJdbcURL, lUsername, lPassword, lStoreQuery, lAttachmentStoreQuery);
           lConnectionDetailsHashMap.put(lDatabaseName, lConnectionDetails);
-        } else {
+        }
+        else {
           throw new ConfigurationException("Invalid database configuration XML");
         }
       }
@@ -162,9 +159,9 @@ public class SMTPConfig {
     }
   }
 
-  private HashMap<String, String> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
+  private List<DomainMatcher> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
   throws ConfigurationException {
-    HashMap<String, String> lRecipientDatabaseMap = new HashMap<>();
+    List<DomainMatcher> lRecipientDatabaseMap = new ArrayList<>();
 
     try {
       NodeList lRecipientNodeList = (NodeList) mXPath.evaluate("/*/recipient_list/recipient", pRootDoc.getDocumentElement(), XPathConstants.NODESET);
@@ -174,18 +171,38 @@ public class SMTPConfig {
         if (lRecipientNode instanceof Element) {
           Element lRecipientElement = (Element) lRecipientNode;
 
-          String lDomain = getUniqueChildNodeText(lRecipientElement, "domain").toLowerCase();
           String lDatabaseName = getUniqueChildNodeText(lRecipientElement, "database");
+
+          String lDomain;
+          boolean lIsRegexDomain;
+
+          XPath lXPath = XPathFactory.newInstance().newXPath();
+          Node lDomainNode = (Node) lXPath.evaluate("./domain", lRecipientElement, XPathConstants.NODE);
+          Node lDomainRegexNode = (Node) lXPath.evaluate("./domain_regex", lRecipientElement, XPathConstants.NODE);
+
+          if (lDomainNode != null && lDomainRegexNode == null){
+            lDomain = lDomainNode.getTextContent();
+            lIsRegexDomain = false;
+          }
+          else if (lDomainRegexNode != null && lDomainNode == null) {
+            lDomain = lDomainRegexNode.getTextContent();
+            lIsRegexDomain = true;
+          }
+          else {
+            throw new ConfigurationException("Only one of domain or domain_regex elements may be declared inside a recipient");
+          }
 
           if (!pDatabaseSet.contains(lDatabaseName)) {
             throw new ConfigurationException("Unknown database " + lDatabaseName);
           }
 
-          if (lRecipientDatabaseMap.containsKey(lDomain)){
-            throw new ConfigurationException("Duplicate recipient " + lDomain);
+          for (DomainMatcher lDomainMatcher : lRecipientDatabaseMap){
+            if (lDomain.equals(lDomainMatcher.getDatabase())){
+              throw new ConfigurationException("Duplicate recipient " + lDomain);
+            }
           }
 
-          lRecipientDatabaseMap.put(lDomain, lDatabaseName);
+          lRecipientDatabaseMap.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName));
         }
         else {
           throw new ConfigurationException("Invalid recipient XML");
@@ -202,29 +219,42 @@ public class SMTPConfig {
   private void configureLoggingFromConfig()
   throws ConfigurationException {
     SMTPConfig lSMTPConfig = SMTPConfig.getInstance();
-    String lLoggingLevel = lSMTPConfig.getLoggingLevel();
     String lLoggingMode = lSMTPConfig.getLoggingMode();
-    Logger lRootLogger = Logger.getRootLogger();
-
-    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
-    Appender lAppender = new NullAppender();
 
     if (LoggingModes.FILE.getText().equals(lLoggingMode)){
       FileAppender lFileAppender = new FileAppender();
       lFileAppender.setFile("logs/dmda.log");
       lFileAppender.activateOptions();
-      lAppender = lFileAppender;
+      configureLoggingWithAppender(lFileAppender);
     }
     else if (LoggingModes.CONSOLE.getText().equals(lLoggingMode)){
-      lAppender = new ConsoleAppender(lLayout);
+      ConsoleAppender lConsoleAppender = new ConsoleAppender();
+      lConsoleAppender.activateOptions();
+      configureLoggingWithAppender(lConsoleAppender);
     }
     else if(!LoggingModes.NONE.getText().equals(lLoggingMode)){
-      throw new ConfigurationException("Invalid logger mode " + lLoggingMode);
+      if(lLoggingMode.endsWith(".xml")){
+        DOMConfigurator.configure(lLoggingMode);
+      }
+      else if(lLoggingMode.endsWith(".properties")){
+        PropertyConfigurator.configure(lLoggingMode);
+      }
+      else {
+        throw new ConfigurationException("Logging mode " + lLoggingMode + " is not a valid logging mode");
+      }
     }
+  }
 
-    lAppender.setLayout(lLayout);
+  private void configureLoggingWithAppender(Appender pAppender){
+    SMTPConfig lSMTPConfig = SMTPConfig.getInstance();
+    String lLoggingLevel = lSMTPConfig.getLoggingLevel();
+    Logger lRootLogger = Logger.getRootLogger();
+
+    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
+    pAppender.setLayout(lLayout);
+
     lRootLogger.removeAllAppenders();
-    lRootLogger.addAppender(lAppender);
+    lRootLogger.addAppender(pAppender);
 
     if (LoggingLevels.DEBUG.getText().equals(lLoggingLevel)) {
       lRootLogger.setLevel(Level.DEBUG);
@@ -292,7 +322,15 @@ public class SMTPConfig {
    */
   private String getUniqueChildNodeText(Element pElement, String pChildTagName)
   throws ConfigurationException {
-    return getUniqueChildElements(pElement, pChildTagName).getTextContent();
+    return getUniqueChildElement(pElement, pChildTagName).getTextContent();
+  }
+
+  private String getUniqueChildNodeTextIfExists(Element pElement, String pChildTagName){
+    try{
+      return getUniqueChildNodeText(pElement, pChildTagName);
+    } catch (ConfigurationException e) {
+      return null;
+    }
   }
 
   /**
@@ -303,7 +341,7 @@ public class SMTPConfig {
    * @return the text content of the child node
    * @throws ConfigurationException
    */
-  private Element getUniqueChildElements(Element pElement, String pChildTagName)
+  private Element getUniqueChildElement(Element pElement, String pChildTagName)
   throws ConfigurationException {
     XPath lXPath = XPathFactory.newInstance().newXPath();
     NodeList lChildNodes;
@@ -340,11 +378,16 @@ public class SMTPConfig {
   /**
    * Returns the database configured for the given destination domain
    *
-   * @param pDestinationDomain Domain that maps to a database
+   * @param pRecipientDomain Domain that maps to a database
    * @return the database configured for the given destination domain
    */
-  public String getDatabaseForRecipient(String pDestinationDomain) {
-    return mRecipientDatabaseMapping.get(pDestinationDomain);
+  public String getDatabaseForRecipient(String pRecipientDomain) {
+    for (DomainMatcher lMatcher : mRecipientDatabaseMapping){
+      if(lMatcher.match(pRecipientDomain)){
+        return lMatcher.getDatabase();
+      }
+    }
+    return null;
   }
 
   /**
@@ -367,24 +410,10 @@ public class SMTPConfig {
   }
 
   /**
-   * Get the connection details for the given recipient's domain
-   *
-   * @param pRecipientDomain Domain mapping to database connection details
-   * @return the connection details for the given recipient's domain
-   */
-  public DatabaseConnectionDetails getConnectionDetailsForRecipient(String pRecipientDomain){
-    String lDatabase = mRecipientDatabaseMapping.get(pRecipientDomain);
-    return mDatabaseConnectionDetailsMap.get(lDatabase);
-  }
-
-  /**
    * Returns a set of all configured recipients
    *
    * @return A set of all configured recipients
    */
-  public Set<String> getRecipientSet() {
-    return mRecipientDatabaseMapping.keySet();
-  }
 
   public String getLoggingMode() {
     return mLoggingMode;

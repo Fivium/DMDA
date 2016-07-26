@@ -1,5 +1,5 @@
 Name:           dmda
-Version:        1.3
+Version:        1.4
 Release:        1
 Summary:        Database Mail Delivery Agent - A simple mail delivery agent designed to store email in a database backend
 
@@ -64,10 +64,12 @@ ln -s /opt/dmda/dmdad /etc/init.d/dmdad
 
 
 %changelog
+* Tu Jul 26 2016 Jonathan Poole <jon.poole@fivium.co.uk> - 1.4
+- Attachment stripping, domain wildcards, configuration enhancements and bug fixes
 * Tue Mar 08 2016 Nick Palmer <nick.palmer-mills@fivium.co.uk> - 1.3
 - Added a /smtp_config/anti_virus/timeout_ms config property so the timeout on the response from ClamAV can be defined.
 - General code tidy
 * Thu Mar 03 2016 Chris Cameron-Mills <chris.cameron-mills@fivium.co.uk> - 1.2
 - Case insensitive domain matching
-* Thu Jul 07 2011 Jonathan Poole <jon.poole@fivium.co.uk> - 1.0
+* Thu Jul 07 2015 Jonathan Poole <jon.poole@fivium.co.uk> - 1.0
 - Initial version of the package

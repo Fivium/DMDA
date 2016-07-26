@@ -5,8 +5,8 @@
 # processname: dmda
 
 DAEMON_PATH="/opt/dmda"
-
-DAEMON="java -jar /opt/dmda/dmda.jar"
+JVMFLAGS="-xms256m -xmx256m -server"
+DAEMON="java -jar /opt/dmda/dmda.jar $JVMFLAGS"
 NAME=dmdad
 DESC="Database Mail Delivery Agent"
 PIDFILE=/var/run/$NAME.pid

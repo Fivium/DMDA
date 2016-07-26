@@ -57,3 +57,8 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 
+#DMDA files
+/config.xml
+logs/
+log.properties
+log.xml

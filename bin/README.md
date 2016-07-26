@@ -16,6 +16,8 @@ Other sysv (initd) distributions:
 - Put these files in /opt/dmda
 - ln -s /opt/dmda/dmdad /etc/init.d
 
+Note: The JVM heap has been limited to 256mb. To increase this value, edit the JVMFLAGS variable in dmdad (once installed, /etc/dmdad). 
+
 Use
 --------------------------------------
 DMDAd implements the basic service commands which can be invoked "service dmdad <command>":

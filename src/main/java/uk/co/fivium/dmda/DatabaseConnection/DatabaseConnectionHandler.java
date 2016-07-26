@@ -42,6 +42,7 @@ public class DatabaseConnectionHandler {
         lDataSource.setUsername(lConnectionDetails.mUsername);
         lDataSource.setPassword(lConnectionDetails.mPassword);
         lDataSource.setPoolName(lConnectionDetails.mName);
+        lDataSource.setAutoCommit(false);
 
       try {
         lDataSource.getConnection().close();
@@ -54,21 +55,21 @@ public class DatabaseConnectionHandler {
   }
 
   /**
-   * Gets a database connection for the provided recipient
+   * Gets a database connection for the provided database name
    *
-   * @param pDestinationDomain The recipients domain name
+   * @param pDatabaseName The database name as configured in config.xml
    * @return A connection to the database for the provided recipient domain
-   * @throws DatabaseConnectionException
+   * @throws DatabaseConnectionException when there's no configured database
    */
-  public Connection getConnection(String pDestinationDomain)
-  throws DatabaseConnectionException {
-    String lDatabaseName = mSMTPConfig.getDatabaseForRecipient(pDestinationDomain);
+
+
+  public Connection getConnection(String pDatabaseName) throws DatabaseConnectionException {
     try {
-      HikariDataSource lDataSource = mDatabaseConnectionPoolMapping.get(lDatabaseName);
+      HikariDataSource lDataSource = mDatabaseConnectionPoolMapping.get(pDatabaseName);
       return lDataSource.getConnection();
     }
     catch (SQLException ex) {
-      DatabaseConnectionDetails lDatabaseConnectionDetails = mSMTPConfig.getConnectionDetailsForDatabase(lDatabaseName);
+      DatabaseConnectionDetails lDatabaseConnectionDetails = mSMTPConfig.getConnectionDetailsForDatabase(pDatabaseName);
       throw new DatabaseConnectionException("Exception getting database connection", lDatabaseConnectionDetails, ex);
     }
   }

@@ -8,7 +8,7 @@ import uk.co.fivium.dmda.TestUtil;
 
 import static org.junit.Assert.assertEquals;
 
-public class testWildCardRecipients {
+public class TestWildCardRecipients {
   SMTPConfig mConfig;
 
   @Before

@@ -61,7 +61,6 @@ public class SMTPConfig {
    *
    * @throws ConfigurationException
    */
-  // TODO make config reloadable (reload on receiving SIGUSR2?)
   public void loadConfig(File pFile)
   throws ConfigurationException {
     try {

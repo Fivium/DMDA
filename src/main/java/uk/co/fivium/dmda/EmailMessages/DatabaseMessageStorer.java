@@ -39,7 +39,6 @@ public class DatabaseMessageStorer implements MessageStorer{
       OraclePreparedStatement lBodyStatement = null;
       OraclePreparedStatement lAttachmentStatement = null;
       try {
-        // TODO look at making this not oracle specific (CallableStatement?)
         // Unwrap the connection into an oracle connection so we can do oracle specific operations
         lConnection = DatabaseConnectionHandler.getInstance().getConnection(lConnectionDetails.mName);
         OracleConnection lOracleConnection = lConnection.unwrap(OracleConnection.class);

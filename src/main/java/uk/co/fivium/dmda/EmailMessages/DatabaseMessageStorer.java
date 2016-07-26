@@ -57,7 +57,7 @@ public class DatabaseMessageStorer implements MessageStorer{
         lOracleConnection.commit();
 
       }
-      catch (SQLException ex) {
+      catch (SQLException|ParserConfigurationException ex) {
         mLogger.error("Error storing email in database " + lConnectionDetails.toString(), ex);
         throw new RejectException();
       }
@@ -92,20 +92,15 @@ public class DatabaseMessageStorer implements MessageStorer{
     return lDatabases;
   }
 
-  private void setHeaderBindIfExists(String pStoreQuery, OraclePreparedStatement pStatement, EmailMessage pEmailMessage) throws SQLException {
+  private void setHeaderBindIfExists(String pStoreQuery, OraclePreparedStatement pStatement, EmailMessage pEmailMessage)
+  throws SQLException, ParserConfigurationException {
     if (pStoreQuery.contains(":" + BindParams.HEADER_XML.getText())) {
-      try {
-        setXMLTypeAtName(pStatement, BindParams.HEADER_XML.getText(), pEmailMessage.getHeadersXML());
-      }
-      catch (ParserConfigurationException ex) {
-        // TODO look into a more sensible behavior for this case
-        mLogger.error("Error building header XML, defaulting to null", ex);
-        pStatement.setStringForClobAtName(BindParams.HEADER_XML.getText(), "");
-      }
+      setXMLTypeAtName(pStatement, BindParams.HEADER_XML.getText(), pEmailMessage.getHeadersXML());
     }
   }
 
-  private void storeMessageBody(EmailMessage pEmailMessage, String lDatabaseName, OraclePreparedStatement pStatement, String pStoreQuery) throws SQLException {
+  private void storeMessageBody(EmailMessage pEmailMessage, String lDatabaseName, OraclePreparedStatement pStatement, String pStoreQuery)
+  throws SQLException, ParserConfigurationException {
     for (EmailRecipient lRecipient : pEmailMessage.getRecipients()){
       String lRecipientDatabase = SMTPConfig.getInstance().getDatabaseForRecipient(lRecipient.mDomain);
       if(lDatabaseName.equals(lRecipientDatabase)){

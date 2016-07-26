@@ -7,7 +7,6 @@ import org.subethamail.smtp.RejectException;
 import org.w3c.dom.Document;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionHandler;
-import uk.co.fivium.dmda.Server.ConfigurationException;
 import uk.co.fivium.dmda.Server.Enumerations.BindParams;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 
@@ -112,7 +111,7 @@ public class DatabaseMessageStorer implements MessageStorer{
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.MAIL_ID.getText(), pEmailMessage.getMailId());
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.USER.getText(), lRecipient.mUser);
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.FROM.getText(), pEmailMessage.getFrom());
-        setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.RECIPIENT.getText(), lRecipient.mEmailAdrress);
+        setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.RECIPIENT.getText(), lRecipient.mEmailAddress);
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.REMOTE_HOSTNAME.getText(), pEmailMessage.getRemoteHostname());
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.REMOTE_ADDRESS.getText(), pEmailMessage.getRemoteAddress());
         setBlobAtNameIfExists(pStoreQuery, pStatement, BindParams.MESSAGE_BODY.getText(), pEmailMessage.getDataStream());

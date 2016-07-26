@@ -40,7 +40,7 @@ public class TestEmailMessage {
       lMessage.addRecipient(lRecipient);
       ArrayList<EmailRecipient> lRecipients = lMessage.getRecipients();
       assertEquals(1, lRecipients.size());
-      assertEquals(lRecipient, lRecipients.get(0).mEmailAdrress);
+      assertEquals(lRecipient, lRecipients.get(0).mEmailAddress);
     } catch (InvalidRecipientException ex) {
       fail("Adding a valid recipient failed");
     }

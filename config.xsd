@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="smtp_config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="port" type="xs:integer"/>
+        <xs:element name="logging_level">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="debug"/>
+              <xs:enumeration value="info"/>
+              <xs:enumeration value="error"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="logging_mode" type="xs:string"/>
+        <xs:element name="email_rejection_message" type="xs:string"/>
+        <xs:element name="message_size_limit_mb" type="xs:integer"/>
+        <xs:element name="anti_virus">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="mode">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="none"/>
+                    <xs:enumeration value="clamd"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="server" minOccurs="0" maxOccurs="1" type="xs:string"/>
+              <xs:element name="port" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+              <xs:element name="timeout" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="database_list">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="database">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:element name="jdbc_url" type="xs:string"/>
+                    <xs:element name="username" type="xs:string"/>
+                    <xs:element name="password" type="xs:string"/>
+                    <xs:element name="store_query" type="xs:string"/>
+                    <xs:element name="attachment_store_query" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="recipient_list" >
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="recipient">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:choice>
+                      <xs:element name="domain" type="xs:string"/>
+                      <xs:element name="domain_regex" type="xs:string"/>
+                    </xs:choice>
+                    <xs:element name="database" type="xs:string"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -27,11 +27,6 @@ public class TestEmailMessage {
     mAttachments = lMessage.getAttachments();
   }
 
-  @Before
-  public void loadConfig() throws ConfigurationException {
-    SMTPConfig.getInstance().loadConfig(TestUtil.getTestResourceFile("../config.xml", TestEmailMessage.class));
-  }
-
   @Test
   public void testAddingValidRecipient() {
     try {
@@ -86,7 +81,7 @@ public class TestEmailMessage {
 
   @Test
   public void testAttachedBodyStripping() throws ParseException, IOException {
-    Attachment lBody = mAttachments.get(0);
+    Attachment lBody = mAttachments.get(0);  // The first attachment should be the body
 
     assertEquals(lBody.getTextContent(), "Hello Mr/Mrs From,\r\n\r\nMessage body goes here\r\n\r\n\r\nThanks,\r\n\r\nMr User\r\n");
     assertEquals(lBody.getTextContent(), new String(StreamUtils.getBytes(lBody.getDataStream())));
@@ -97,7 +92,7 @@ public class TestEmailMessage {
 
   @Test
   public void testAttachedImageStripping(){
-    Attachment lImage = mAttachments.get(1);
+    Attachment lImage = mAttachments.get(1); // The second attachment in the eml is an image
     assertNotNull(lImage.getDataStream());
     assertEquals("attachment", lImage.getDisposition());
     assertEquals("image/png;\r\n name=\"test.png\"", lImage.getContentType());
@@ -107,7 +102,7 @@ public class TestEmailMessage {
 
   @Test
   public void testAttachedTextDocumentStripping(){
-    Attachment lTextFile = mAttachments.get(2);
+    Attachment lTextFile = mAttachments.get(2); // The third is a test.txt file
     assertEquals("attachment", lTextFile.getDisposition());
     assertEquals("text/plain; charset=UTF-8;\r\n name=\"test.txt\"", lTextFile.getContentType());
     assertEquals("test.txt", lTextFile.getFileName());

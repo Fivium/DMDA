@@ -5,8 +5,10 @@
   <!-- Logging level can be set to debug, info or error -->
   <logging_level>info</logging_level>
   <!--
-  Logging mode can be set to console, file or a path to a *.properties or a *.xml file. See log.properties.sample
-  for an example.
+  Logging mode can either be set to one of three defaults or a path to a log.properties file or a log.xml file. The
+  defaults are file to log to logs/dmda.log, console to log to std out or none to disable logging. For guidance on
+  setting up logs using a .properties file see log.properties.sample. This file is used by the log4j configurator so
+  further guidance can be found in their documentation.
   -->
   <logging_mode>console</logging_mode>
   <!-- The generic message that is used when an email is rejected -->
@@ -58,6 +60,26 @@ INSERT INTO inbox(
 , :subject
 )
       </store_query>
+      <!-- This query is used to store the attachments that have been stripped from the email individually.  -->
+      <attachment_store_query>
+INSERT INTO jamesmgr.attachments(
+  message_name
+, content_type
+, content_disposition
+, file_name
+, data
+, text_data
+, datetime
+) VALUES (
+  :mail_id
+, :content_type
+, :content_disposition
+, :file_name
+, :content_data
+, :text_content
+, sysdate
+)
+      </attachment_store_query>
     </database>
   </database_list>
   <!-- The recipient list has a many to 1 relationship with the databases above. -->

@@ -23,6 +23,7 @@ public class TestAVScanner {
   public void testScannerFactoryNoAv() throws ConfigurationException, NoSuchFieldException, IllegalAccessException {
     resetAVScannerFactory();
 
+    // load in the config that has no anti-virus configured
     mSMTPConfig.loadConfig(TestUtil.getTestResourceFile("../config.xml", this.getClass()));
     AVScanner lScanner = AVScannerFactory.getScanner();
 
@@ -35,6 +36,7 @@ public class TestAVScanner {
   public void testScannerFactoryClamd() throws ConfigurationException, NoSuchFieldException, IllegalAccessException {
     resetAVScannerFactory();
 
+    // load in the config that has the clamd anti-virus configured
     mSMTPConfig.loadConfig(TestUtil.getTestResourceFile("av_config.xml", this.getClass()));
     AVScanner lScanner = AVScannerFactory.getScanner();
 
@@ -46,6 +48,6 @@ public class TestAVScanner {
   public void resetAVScannerFactory() throws NoSuchFieldException, IllegalAccessException {
     Field lField = AVScannerFactory.class.getDeclaredField("mAVScanner");
     lField.setAccessible(true);
-    lField.set(null, null);
+    lField.set(null, null); // set the static field to null
   }
 }

@@ -81,6 +81,11 @@ public class TestSMTPConfig {
       Map<String, DatabaseConnectionDetails> lMapping = mConfig.getDatabaseConnectionDetailsMapping();
       assertEquals(lMapping.size(), 2);
 
+      /*
+       * well_populated_config.xml is set up such that each field is <db_number> concatenated with the field name. For
+       * example, the password for the first database is password1. These methods check that this information is being
+       * read correctly for both databases.
+       */
       testDatabaseDetails(1, lMapping);
       testDatabaseDetails(2, lMapping);
 

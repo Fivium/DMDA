@@ -17,6 +17,9 @@ public class TestWildCardRecipients {
     mConfig.loadConfig(TestUtil.getTestResourceFile("wildcard_config.xml", this.getClass()));
   }
 
+  /*
+  * These three methods check that the wild card matching for recipients is working as configured in wildcard_config.xml
+  */
   @Test
   public void testExactDomain(){
     String lDatabaseName = mConfig.getDatabaseForRecipient("exact.domain.co.uk");

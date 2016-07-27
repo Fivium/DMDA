@@ -50,17 +50,23 @@ rm -rf %{buildroot}
 
 
 %preun
-unlink /etc/init.d/dmdad
+if [ -L /etc/init.d/dmdad ];then
+  # only unlink if this is an uninstall rather than an upgrade
+  if [ "$1" = "0" ];then
+    unlink /etc/init.d/dmdad
+  fi
+fi
 
 
 %pre
 if [ -L /etc/init.d/dmdad ];then
- unlink /etc/init.d/dmdad
+  unlink /etc/init.d/dmdad
 fi
 
 
 %post
 ln -s /opt/dmda/dmdad /etc/init.d/dmdad
+chmod u+x dmdad
 
 
 %changelog

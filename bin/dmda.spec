@@ -33,7 +33,9 @@ tar -xzf %_sourcedir/dmda.tar.gz
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/opt/dmda
+mkdir -p %{buildroot}/etc/init.d
 cp -p  %_builddir/* %{buildroot}/opt/dmda
+mv %{buildroot}/opt/dmda/dmdad %{buildroot}/etc/init.d
 
 %clean
 rm -rf %{buildroot}
@@ -41,32 +43,14 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%dir /opt
-%dir /opt/dmda
-/opt/dmda/dmdad
+/etc/init.d/dmdad
 /opt/dmda/dmda.jar
 /opt/dmda/LICENSE
 /opt/dmda/config.xml.sample
 
 
-%preun
-if [ -L /etc/init.d/dmdad ];then
-  # only unlink if this is an uninstall rather than an upgrade
-  if [ "$1" = "0" ];then
-    unlink /etc/init.d/dmdad
-  fi
-fi
-
-
-%pre
-if [ -L /etc/init.d/dmdad ];then
-  unlink /etc/init.d/dmdad
-fi
-
-
 %post
-ln -s /opt/dmda/dmdad /etc/init.d/dmdad
-chmod u+x dmdad
+chmod u+x /etc/init.d/dmdad
 
 
 %changelog

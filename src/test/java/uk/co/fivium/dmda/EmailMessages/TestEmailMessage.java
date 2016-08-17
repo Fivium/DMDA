@@ -108,4 +108,11 @@ public class TestEmailMessage {
     assertEquals("test.txt", lTextFile.getFileName());
     assertEquals("the attachment is a circle", lTextFile.getTextContent());
   }
+
+  @Test
+  public void testUnicodeSubjectMessage(){
+    EmailMessage lMessage = new EmailMessage("mailid");
+    lMessage.addData(TestUtil.getTestResourceStream("unicode_subject_message.eml", this.getClass()));
+    assertEquals("℀ ℁ ℂ ℃ ℄ ℅ ℆ ℇ ℈ ℉ ℊ ℋ ℌ ℍ ℎ ℏ ℐ ℑ ℒ ℓ ℔ ℕ № ℗ ℘ ℙ ℚ ℛ ℜ ℝ ℞ ℟ ℠ ℡ ™ ℣ ℤ ℥ Ω ℧ ℨ ℩ K Å ℬ ℭ ℮ ℯ ℰ ℱ Ⅎ ℳ ℴ ℵ ℶ ℷ ℸ", lMessage.getSubject());
+  }
 }

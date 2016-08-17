@@ -1,0 +1,25 @@
+X-Mozilla-Status: 0000
+X-Mozilla-Status2: 00000000
+X-Mozilla-Keys:                                                                                 
+FCC: mailbox://nobody@Local%20Folders/Sent
+X-Identity-Key: id1
+X-Account-Key: account2
+To: receiver@domain.com
+From: sender@domain.co.uk
+Subject: =?UTF-8?B?4oSAIOKEgSDihIIg4oSDIOKEhCDihIUg4oSGIOKEhyDihIgg4oSJIA==?=
+ =?UTF-8?B?4oSKIOKEiyDihIwg4oSNIOKEjiDihI8g4oSQIOKEkSDihJIg4oSTIOKElCDihJUg?=
+ =?UTF-8?B?4oSWIOKElyDihJgg4oSZIOKEmiDihJsg4oScIOKEnSDihJ4g4oSfIOKEoCDihKEg?=
+ =?UTF-8?B?4oSiIOKEoyDihKQg4oSlIOKEpiDihKcg4oSoIOKEqSDihKog4oSrIOKErCDihK0g?=
+ =?UTF-8?B?4oSuIOKEryDihLAg4oSxIOKEsiDihLMg4oS0IOKEtSDihLYg4oS3IOKEuA==?=
+Message-ID: <9d4b4df1-d5d7-206c-1980-5ce0014f1d17@fivium.local>
+Date: Wed, 17 Aug 2016 15:28:39 +0100
+X-Mozilla-Draft-Info: internal/draft; vcard=0; receipt=0; DSN=0; uuencode=0;
+ attachmentreminder=0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+this is the subject: ℀ ℁ ℂ ℃ ℄ ℅ ℆ ℇ ℈ ℉ ℊ ℋ ℌ ℍ ℎ ℏ ℐ ℑ ℒ ℓ ℔ ℕ № ℗ ℘ ℙ 
+ℚ ℛ ℜ ℝ ℞ ℟ ℠ ℡ ™ ℣ ℤ ℥ Ω ℧ ℨ ℩ K Å ℬ ℭ ℮ ℯ ℰ ℱ Ⅎ ℳ ℴ ℵ ℶ ℷ ℸ

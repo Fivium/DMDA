@@ -47,14 +47,16 @@ public class TestEmailMessage {
   public void testInvalidEmailAddress() {
     try {
       String lRecipient = "exact.domain.co.uk";
-      EmailMessage lMessage = new EmailMessage("mailid");
-      lMessage.addRecipient(lRecipient);
+      EmailMessage lEmailMessage = new EmailMessage("mailid");
+      lEmailMessage.addRecipient(lRecipient);
     }
     catch (RejectException ex) {
+      return;
     }
     catch (Exception ex) {
       fail("Unexpected exception" + ex.getMessage());
     }
+    fail("Invalid email address parsed successfully when it should have failed");
   }
 
   @Test

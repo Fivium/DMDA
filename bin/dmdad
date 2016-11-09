@@ -14,26 +14,27 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 case "$1" in
 start)
-	printf "%-50s" "Starting $NAME..."
+        printf "%-50s" "Starting $NAME..."
 
-	if [ -f $PIDFILE ]; then
-		printf "%s\n" "Cannot start server as $PIDFILE exists."
-	else
-		cd $DAEMON_PATH
-		$DAEMON &
-		PID=`echo $!`
+        if [ -f $PIDFILE ]; then
+                printf "%s\n" "Warning: A pidfile exists at $PIDFILE. Restarting the service."
+                $0 restart
+        else
+                cd $DAEMON_PATH
+                $DAEMON &
+                PID=`echo $!`
 
-		# Wait 2 seconds before creating the pid file incase the server encounters a startup error
-        	sleep 2
+                # Wait 2 seconds before creating the pid file incase the server encounters a startup error
+                sleep 2
 
-		if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
-			printf "%s\n" "Fail"
-		else
-			echo $PID > $PIDFILE
-        		printf "%s\n" "Ok"
-        	fi
+                if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+                        printf "%s\n" "Fail"
+                else
+                        echo $PID > $PIDFILE
+                        printf "%s\n" "Ok"
+                fi
 
-	fi
+        fi
 ;;
 status)
         printf "%-50s" "Checking $NAME..."
@@ -62,8 +63,8 @@ stop)
 ;;
 
 restart)
-  	$0 stop
-  	$0 start
+        $0 stop
+        $0 start
 ;;
 
 *)

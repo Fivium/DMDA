@@ -3,6 +3,7 @@ package uk.co.fivium.dmda.EmailMessages;
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.subethamail.smtp.RejectException;
 import uk.co.fivium.dmda.Server.ConfigurationException;
 import uk.co.fivium.dmda.Server.SMTPConfig;
 import uk.co.fivium.dmda.TestUtil;
@@ -39,6 +40,20 @@ public class TestEmailMessage {
     }
     catch (InvalidRecipientException ex) {
       fail("Adding a valid recipient failed");
+    }
+  }
+
+  @Test
+  public void testInvalidEmailAddress() {
+    try {
+      String lRecipient = "exact.domain.co.uk";
+      EmailMessage lMessage = new EmailMessage("mailid");
+      lMessage.addRecipient(lRecipient);
+    }
+    catch (RejectException ex) {
+    }
+    catch (Exception ex) {
+      fail("Unexpected exception" + ex.getMessage());
     }
   }
 

@@ -97,7 +97,7 @@ INSERT INTO jamesmgr.attachments(
       here the domain will be matched using a regular expression. Recipient domains will be matched against recipients
       in the order they are defined here. The first match will be used.
       -->
-      <regex_domain>.*\..*\.co.uk</regex_domain>
+      <domain_regex>.*\..*\.co.uk</domain_regex>
       <database>database_name</database>
     </recipient>
   </recipient_list>

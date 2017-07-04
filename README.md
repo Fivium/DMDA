@@ -23,6 +23,18 @@ folder you run the following command:
 
 `java -jar ./target/dmda-x.x-SNAPSHOT-jar-with-dependencies.jar`
 
+Health Checks
+--------------------------------------
+DMDA provides the following basic application health checks, which can be queried over HTTP.
+These are disabled by default, but when enabled the following endpoints become available:
+
+|Endpoint|Description|Returns|
+|---|---|---|
+|`/smtp-status`|Checks that the SMTP server is running.|An HTTP 200 OK if the SMTP server is running, otherwise a 503 Service Unavailable.|
+|`/db-status?security-token=foobar`|Checks that a valid connection can be made to each database in the database_list. Note that a security token needs to be provided to access this endpoint, and it must match the one defined in the config.|A list of databases (identified by DB name and JDBC connection URL) and a boolean value indicating if the application can establish a valid connection to the database.|
+|`/av-status`|Checks that a valid connection can be made to the virus scanner.|An HTTP 200 OK if a connection to the AV service can be established, or a 503 Service Unavailable otherwise.|
+
+Note that these endpoints should only be exposed locally to monitoring tools such as Monitis, Zabbix, Nagios etc. or used within Docker containers as HEALTHCHECK directives. They are not designed to be accessible from the internet.
 
 Requirements
 --------------------------------------

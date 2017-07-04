@@ -22,6 +22,21 @@
     <port>3310</port>
     <timeout_ms>300000</timeout_ms>
   </anti_virus>
+  <!--
+  Enable or disable http based health check endpoints (default disabled). These can be used to monitor the health of this application instance.
+  If enabled, the following endpoints are available:
+  /smtp-status - Checks that the SMTP server is running.
+  /db-status - Checks that a valid connection can be made to each database in the database_list.
+  /av-status - Checks that a valid connection can be made to the virus scanner.
+  Note that a security token must be included as a query parameter to requests to the db-status endpoint.
+  These endpoints should only be exposed locally to monitoring tools such as Monitis, Zabbix, Nagios etc. or within Docker
+  containers as healthchecks.
+  -->
+  <health_checks>
+    <enable_http_health_checks>false</enable_http_health_checks>
+    <port>8080</port>
+    <security_token>changeMe</security_token>
+  </health_checks>
   <!-- The list of databases. Databases have a many to 1 relationship with recipients. -->
   <database_list>
     <database>

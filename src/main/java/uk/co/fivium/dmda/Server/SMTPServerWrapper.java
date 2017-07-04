@@ -26,9 +26,15 @@ public class SMTPServerWrapper {
     mSMTPServer = new SMTPServer(lMessageHandlerFactory);
     mSMTPServer.setPort(mSMTPConfig.getSmtpPort());
     mSMTPServer.start();
-  }
+      }
+
 
   public void stop(){
     mSMTPServer.stop();
   }
+
+  public boolean isRunning() {
+    return mSMTPServer != null && mSMTPServer.isRunning();
+  }
+
 }

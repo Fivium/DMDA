@@ -1,13 +1,12 @@
 package uk.co.fivium.dmda.Server;
 
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.TestUtil;
 
-import java.io.File;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,6 +53,9 @@ public class TestSMTPConfig {
       assertEquals(mConfig.getAVMode(), "clamd");
       assertEquals(mConfig.getAVServer(), "clamd_server");
       assertEquals(mConfig.getAVTimeoutMS(), 1000);
+      assertEquals(mConfig.isHealthCheckEnabled(), true);
+      assertEquals(mConfig.getHealthCheckPort(), 8080);
+      assertEquals(mConfig.getHealthCheckSecurityToken(), "hunter2");
     }
     catch (ConfigurationException e) {
       fail("Good configuration failed to parse");

@@ -17,6 +17,12 @@
         <port>3310</port>
         <timeout_ms>1000</timeout_ms>
     </anti_virus>
+    <!-- Enable health check service -->
+    <health_checks>
+        <enable_http_health_checks>true</enable_http_health_checks>
+        <port>8080</port>
+        <security_token>hunter2</security_token>
+    </health_checks>
     <!-- The list of databases. Databases have a many to 1 relationship with recipients. -->
     <database_list>
         <database>

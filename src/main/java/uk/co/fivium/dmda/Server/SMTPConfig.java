@@ -1,17 +1,23 @@
 package uk.co.fivium.dmda.Server;
 
-import org.apache.log4j.*;
-import org.apache.log4j.varia.NullAppender;
+import org.apache.log4j.Appender;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
-import uk.co.fivium.dmda.AntiVirus.AVModes;
-import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import uk.co.fivium.dmda.AntiVirus.AVModes;
+import uk.co.fivium.dmda.DatabaseConnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.Server.Enumerations.BindParams;
-import uk.co.fivium.dmda.Server.Enumerations.LoggingModes;
 import uk.co.fivium.dmda.Server.Enumerations.LoggingLevels;
+import uk.co.fivium.dmda.Server.Enumerations.LoggingModes;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,7 +26,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +56,10 @@ public class SMTPConfig {
   private int mAVPort;
   private int mAVTimeoutMS;
   private int mMessageSizeLimit;
+
+  private boolean mIsHealthCheckEnabled;
+  private int mHealthCheckPort;
+  private String mHealthCheckSecurityToken;
 
   // Make this a singleton
   private SMTPConfig(){}
@@ -78,6 +94,9 @@ public class SMTPConfig {
       mRecipientDatabaseMapping = parseRecipientDatabaseMapping(lRootDoc, mDatabaseConnectionDetailsMap.keySet());
 
       loadAVConfig(lRootElement);
+
+      loadHealthCheckConfig(lRootElement);
+
       configureLoggingFromConfig();
     }
     catch (ConfigurationException ex) {
@@ -100,6 +119,21 @@ public class SMTPConfig {
     }
     else if (!AVModes.NONE.getText().equals(mAVMode)){
       throw new ConfigurationException("Unknown anti-virus mode " + mAVMode);
+    }
+  }
+
+  private void loadHealthCheckConfig(Element pRootElement)
+  throws ConfigurationException {
+
+    Optional<Element> lHealthCheckConfig = getUniqueChildElementIfExists(pRootElement, "health_checks");
+
+    if (lHealthCheckConfig.isPresent()) {
+      mIsHealthCheckEnabled = "true".equals(getUniqueChildNodeText(lHealthCheckConfig.get(), "enable_http_health_checks"));
+      mHealthCheckPort = getUniqueChildNodeInt(lHealthCheckConfig.get(), "port");
+      mHealthCheckSecurityToken = getUniqueChildNodeText(lHealthCheckConfig.get(), "security_token");
+    }
+    else {
+      mIsHealthCheckEnabled = false;
     }
   }
 
@@ -303,6 +337,18 @@ public class SMTPConfig {
     return mMessageSizeLimit;
   }
 
+  public boolean isHealthCheckEnabled() {
+    return mIsHealthCheckEnabled;
+  }
+
+  public int getHealthCheckPort() {
+    return mHealthCheckPort;
+  }
+
+  public String getHealthCheckSecurityToken() {
+    return mHealthCheckSecurityToken;
+  }
+
   /**
    * @return the size limit in a user readable format (i.e. 15MB)
    */
@@ -360,6 +406,38 @@ public class SMTPConfig {
     }
 
     return (Element) lChildNodes.item(0);
+  }
+
+  /**
+   * Fetches a child node wrapped an in Optional
+   *
+   * @param pElement The element to fetch the child node from
+   * @param pChildTagName The name of the element to fetch
+   * @return An Optional wrapping the element
+   * @throws ConfigurationException
+   */
+  private Optional<Element> getUniqueChildElementIfExists(Element pElement, String pChildTagName)
+    throws ConfigurationException {
+    XPath lXPath = XPathFactory.newInstance().newXPath();
+    NodeList lChildNodes;
+
+    try {
+      lChildNodes = (NodeList) lXPath.evaluate("./" + pChildTagName, pElement, XPathConstants.NODESET);
+    }
+    catch (XPathExpressionException ex) {
+      throw new ConfigurationException("Configuration XML error. XPATH error fetching " + pChildTagName, ex);
+    }
+
+    if (lChildNodes.getLength() > 1){
+      throw new ConfigurationException("Configuration XML error. Multiple " + pChildTagName + " in " + pElement.getTagName());
+    }
+    else if (lChildNodes.getLength() == 0){
+      return Optional.empty();
+    }
+    else {
+      return Optional.of((Element) lChildNodes.item(0));
+    }
+
   }
 
   /**

@@ -1,7 +1,8 @@
 package uk.co.fivium.dmda.DatabaseConnection;
 
-import uk.co.fivium.dmda.Server.SMTPConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.log4j.Logger;
+import uk.co.fivium.dmda.Server.SMTPConfig;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -80,4 +81,35 @@ public class DatabaseConnectionHandler {
   public void shutDown() {
     mDatabaseConnectionPoolMapping.values().forEach(HikariDataSource::shutdown);
   }
+
+  /**
+   * Requests a connection from each registered database, and runs the isValid check.
+   *
+   * @return A Map of registered databases to their status. True indicates the given database connection is valid, false indicates
+   *         the application was unable to communicate with the given database.
+   */
+  public Map<String, Boolean> testConnections() {
+
+    Map<String, Boolean> lTestResults = new HashMap<>();
+
+    for (Map.Entry<String, HikariDataSource> lDatabase : mDatabaseConnectionPoolMapping.entrySet()) {
+
+      String lDatabaseIdentifier = lDatabase.getKey() + ": " + lDatabase.getValue().getJdbcUrl();
+      boolean lIsValid;
+
+      // Test the connection
+      try (Connection lConnection = lDatabase.getValue().getConnection()) {
+        lIsValid = lConnection.isValid(5);
+      }
+      catch (SQLException ex) {
+        Logger.getRootLogger().warn("Exception when testing database connection '" + lDatabaseIdentifier + "'.", ex);
+        lIsValid = false;
+      }
+
+      lTestResults.put(lDatabaseIdentifier, lIsValid);
+    }
+
+    return lTestResults;
+  }
+
 }

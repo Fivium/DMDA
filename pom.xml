@@ -29,7 +29,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>uk.co.fivium.dmda.Server.SMTPStart</mainClass>
+              <mainClass>uk.co.fivium.dmda.server.SMTPStart</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -41,7 +41,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>uk.co.fivium.dmda.Server.SMTPStart</mainClass>
+              <mainClass>uk.co.fivium.dmda.server.SMTPStart</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>

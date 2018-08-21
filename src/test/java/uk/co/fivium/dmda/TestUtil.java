@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class TestUtil {
+
+  private TestUtil() {}
+
   public static InputStream getTestResourceStream(String pName, Class pClass){
     return pClass.getResourceAsStream(pName);
   }

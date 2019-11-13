@@ -1,5 +1,8 @@
 package uk.co.fivium.dmda.server;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.Comparator;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -65,7 +68,7 @@ public class SMTPConfig {
   private SMTPConfig(){}
 
   public boolean isValidRecipient(String lRecipientDomain) {
-    return getDatabaseForRecipient(lRecipientDomain) != null;
+    return !getDatabasesForRecipient(lRecipientDomain).isEmpty();
   }
 
   public static SMTPConfig getInstance() {
@@ -209,10 +212,21 @@ public class SMTPConfig {
 
           String lDomain;
           boolean lIsRegexDomain;
+          int lPriority = Integer.MAX_VALUE;
 
           XPath lXPath = XPathFactory.newInstance().newXPath();
           Node lDomainNode = (Node) lXPath.evaluate("./domain", lRecipientElement, XPathConstants.NODE);
           Node lDomainRegexNode = (Node) lXPath.evaluate("./domain_regex", lRecipientElement, XPathConstants.NODE);
+          Node lPriorityNode = (Node) lXPath.evaluate("./priority", lRecipientElement, XPathConstants.NODE);
+
+          if (lPriorityNode != null) {
+            try {
+              lPriority = Integer.parseInt(lPriorityNode.getTextContent());
+            } catch (NumberFormatException e) {
+              throw new ConfigurationException(
+                  String.format("Invalid priority value %s", lPriorityNode.getTextContent()), e);
+            }
+          }
 
           if (lDomainNode != null && lDomainRegexNode == null){
             lDomain = lDomainNode.getTextContent();
@@ -236,12 +250,14 @@ public class SMTPConfig {
             }
           }
 
-          lRecipientDatabaseMap.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName));
+          lRecipientDatabaseMap.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName, lPriority));
         }
         else {
           throw new ConfigurationException("Invalid recipient XML");
         }
       }
+
+      lRecipientDatabaseMap.sort(Comparator.nullsLast(Comparator.comparing(DomainMatcher::getPriority)));
 
       return lRecipientDatabaseMap;
     }
@@ -454,18 +470,25 @@ public class SMTPConfig {
   }
 
   /**
-   * Returns the database configured for the given destination domain
+   * Returns the databases configured for the given destination domain
    *
    * @param pRecipientDomain Domain that maps to a database
-   * @return the database configured for the given destination domain
+   * @return a list of databases configured for the given destination domain
    */
-  public String getDatabaseForRecipient(String pRecipientDomain) {
-    for (DomainMatcher lMatcher : mRecipientDatabaseMapping){
-      if(lMatcher.match(pRecipientDomain)){
-        return lMatcher.getDatabase();
-      }
-    }
-    return null;
+  public List<String> getDatabasesForRecipient(String pRecipientDomain) {
+    List<DomainMatcher> lMatchedMatchers = mRecipientDatabaseMapping.stream()
+        .filter(matcher -> matcher.match(pRecipientDomain))
+        .collect(toList());
+
+    Integer lowestPriority = lMatchedMatchers.stream()
+        .map(DomainMatcher::getPriority)
+        .findFirst()
+        .orElse(0);
+
+    return lMatchedMatchers.stream()
+        .filter(matcher -> matcher.getPriority() <= lowestPriority)
+        .map(DomainMatcher::getDatabase)
+        .collect(toList());
   }
 
   /**

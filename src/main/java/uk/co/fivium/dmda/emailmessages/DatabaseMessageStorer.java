@@ -83,10 +83,9 @@ public class DatabaseMessageStorer implements MessageStorer{
   private ArrayList<String> getUniqueDatabaseDestinations(EmailMessage pEmailMessage){
     ArrayList<String> lDatabases = new ArrayList<>();
     for (EmailRecipient lRecipient : pEmailMessage.getRecipients()){
-      String lDatabaseName = SMTPConfig.getInstance().getDatabaseForRecipient(lRecipient.mDomain);
-      if (!lDatabases.contains(lDatabaseName)){
-        lDatabases.add(lDatabaseName);
-      }
+      SMTPConfig.getInstance().getDatabasesForRecipient(lRecipient.mDomain).stream()
+          .filter(databaseName -> !lDatabases.contains(databaseName))
+          .forEach(lDatabases::add);
     }
 
     return lDatabases;
@@ -102,16 +101,18 @@ public class DatabaseMessageStorer implements MessageStorer{
   private void storeMessageBody(EmailMessage pEmailMessage, String lDatabaseName, OraclePreparedStatement pStatement, String pStoreQuery)
   throws SQLException, ParserConfigurationException {
     for (EmailRecipient lRecipient : pEmailMessage.getRecipients()){
-      String lRecipientDatabase = SMTPConfig.getInstance().getDatabaseForRecipient(lRecipient.mDomain);
-      if(lDatabaseName.equals(lRecipientDatabase)){
+      if (SMTPConfig.getInstance().getDatabasesForRecipient(lRecipient.mDomain).contains(lDatabaseName)) {
         // Bind values to the bind variables if they exist in the store query.
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.MAIL_ID.getText(), pEmailMessage.getMailId());
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.USER.getText(), lRecipient.mUser);
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.FROM.getText(), pEmailMessage.getFrom());
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.RECIPIENT.getText(), lRecipient.mEmailAddress);
-        setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.REMOTE_HOSTNAME.getText(), pEmailMessage.getRemoteHostname());
-        setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.REMOTE_ADDRESS.getText(), pEmailMessage.getRemoteAddress());
-        setBlobAtNameIfExists(pStoreQuery, pStatement, BindParams.MESSAGE_BODY.getText(), pEmailMessage.getDataStream());
+        setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.REMOTE_HOSTNAME.getText(),
+            pEmailMessage.getRemoteHostname());
+        setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.REMOTE_ADDRESS.getText(),
+            pEmailMessage.getRemoteAddress());
+        setBlobAtNameIfExists(pStoreQuery, pStatement, BindParams.MESSAGE_BODY.getText(),
+            pEmailMessage.getDataStream());
         setStringAtNameIfExists(pStoreQuery, pStatement, BindParams.SUBJECT.getText(), pEmailMessage.getSubject());
         setDateAtNameIfExists(pStoreQuery, pStatement, BindParams.SENT_DATE.getText(), pEmailMessage.getSentDate());
         setHeaderBindIfExists(pStoreQuery, pStatement, pEmailMessage);
@@ -120,7 +121,6 @@ public class DatabaseMessageStorer implements MessageStorer{
       }
     }
   }
-
 
   private void storeAttachments(EmailMessage pEmailMessage, OraclePreparedStatement pStatement, String pStoreQuery) throws SQLException {
     for (Attachment lAttachment : pEmailMessage.getAttachments()){

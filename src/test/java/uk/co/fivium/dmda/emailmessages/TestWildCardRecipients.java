@@ -1,5 +1,6 @@
 package uk.co.fivium.dmda.emailmessages;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.co.fivium.dmda.server.ConfigurationException;
@@ -7,6 +8,7 @@ import uk.co.fivium.dmda.server.SMTPConfig;
 import uk.co.fivium.dmda.TestUtil;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestWildCardRecipients {
   SMTPConfig mConfig;
@@ -22,18 +24,24 @@ public class TestWildCardRecipients {
   */
   @Test
   public void testExactDomain(){
-    String lDatabaseName = mConfig.getDatabaseForRecipient("exact.domain.co.uk");
-    assertEquals("db1", lDatabaseName);
+    List<String> lDatabaseNames = mConfig.getDatabasesForRecipient("exact.domain.co.uk");
+    assertEquals(3, lDatabaseNames.size());
+    assertTrue(lDatabaseNames.contains("db1"));
+    assertTrue(lDatabaseNames.contains("db2"));
+    assertTrue(lDatabaseNames.contains("db3"));
   }
   @Test
   public void testFuzzyDomainMatch(){
-    String lDatabaseName = mConfig.getDatabaseForRecipient("not_exact.domain.co.uk");
-    assertEquals("db2", lDatabaseName);
+    List<String> lDatabaseNames = mConfig.getDatabasesForRecipient("not_exact.domain.co.uk");
+    assertEquals(2, lDatabaseNames.size());
+    assertTrue(lDatabaseNames.contains("db2"));
+    assertTrue(lDatabaseNames.contains("db3"));
   }
   @Test
   public void testAnyDomainMatch(){
-    String lDatabaseName = mConfig.getDatabaseForRecipient("not.exact.co.uk");
-    assertEquals("db3", lDatabaseName);
+    List<String> lDatabaseNames = mConfig.getDatabasesForRecipient("not.exact.co.uk");
+    assertEquals(1, lDatabaseNames.size());
+    assertTrue(lDatabaseNames.contains("db3"));
   }
 
 }

@@ -198,7 +198,7 @@ public class SMTPConfig {
 
   private List<DomainMatcher> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
   throws ConfigurationException {
-    List<DomainMatcher> lRecipientDatabaseMap = new ArrayList<>();
+    List<DomainMatcher> lRecipientDatabaseList = new ArrayList<>();
 
     try {
       NodeList lRecipientNodeList = (NodeList) mXPath.evaluate("/*/recipient_list/recipient", pRootDoc.getDocumentElement(), XPathConstants.NODESET);
@@ -244,22 +244,20 @@ public class SMTPConfig {
             throw new ConfigurationException("Unknown database " + lDatabaseName);
           }
 
-          for (DomainMatcher lDomainMatcher : lRecipientDatabaseMap){
+          for (DomainMatcher lDomainMatcher : lRecipientDatabaseList){
             if (lDomain.equals(lDomainMatcher.getDatabase())){
               throw new ConfigurationException("Duplicate recipient " + lDomain);
             }
           }
 
-          lRecipientDatabaseMap.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName, lPriority));
+          lRecipientDatabaseList.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName, lPriority));
         }
         else {
           throw new ConfigurationException("Invalid recipient XML");
         }
       }
 
-      lRecipientDatabaseMap.sort(Comparator.nullsLast(Comparator.comparing(DomainMatcher::getPriority)));
-
-      return lRecipientDatabaseMap;
+      return lRecipientDatabaseList;
     }
     catch (XPathExpressionException ex) {
       throw new ConfigurationException("XPath error loading recipient list", ex);
@@ -482,8 +480,8 @@ public class SMTPConfig {
 
     Integer lowestPriority = lMatchedMatchers.stream()
         .map(DomainMatcher::getPriority)
-        .findFirst()
-        .orElse(0);
+        .min(Integer::compareTo)
+        .orElse(Integer.MAX_VALUE);
 
     return lMatchedMatchers.stream()
         .filter(matcher -> matcher.getPriority() <= lowestPriority)

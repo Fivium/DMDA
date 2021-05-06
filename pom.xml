@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.co.fivium</groupId>
   <artifactId>dmda</artifactId>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>dmda</name>
   <properties>
@@ -29,7 +29,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>uk.co.fivium.dmda.Server.SMTPStart</mainClass>
+              <mainClass>uk.co.fivium.dmda.server.SMTPStart</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -41,7 +41,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>uk.co.fivium.dmda.Server.SMTPStart</mainClass>
+              <mainClass>uk.co.fivium.dmda.server.SMTPStart</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -54,6 +54,25 @@
             <phase>package</phase>
             <goals>
               <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
             </goals>
           </execution>
         </executions>

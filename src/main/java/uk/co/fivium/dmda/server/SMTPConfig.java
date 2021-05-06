@@ -115,13 +115,13 @@ public class SMTPConfig {
     String lEnvAVMode = System.getenv("DMDA_AV_MODE");
     Optional<Element> lXmlAVConfig = getUniqueChildElementIfExists(pRootElement, "anti_virus");
 
-    if(lEnvAVMode != null) {
-      if(lXmlAVConfig.isPresent()) {
+    if (lEnvAVMode != null) {
+      if (lXmlAVConfig.isPresent()) {
         LOGGER.warn("Anti-virus config found in both environment variables and XML config file. Environment variables will take precedence.");
       }
       loadAVConfigFromEnv(lEnvAVMode);
     }
-    else if(lXmlAVConfig.isPresent()){
+    else if (lXmlAVConfig.isPresent()){
       loadAVConfigFromXML(lXmlAVConfig.get());
     }
     else {

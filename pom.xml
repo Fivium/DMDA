@@ -100,9 +100,8 @@
       <artifactId>subethasmtp</artifactId>
       <version>3.1.7</version>
     </dependency>
-    <!-- Make sure you run `mvn install:install-file -Dfile=ojdbc6-11.2.0.4.jar -DgroupId=com.oracle.jdbc -DartifactId=ojdbc6 -Dversion=11.2.0.4 -Dpackaging=jar` first -->
     <dependency>
-      <groupId>com.oracle.jdbc</groupId>
+      <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc6</artifactId>
       <version>11.2.0.4</version>
     </dependency>
@@ -110,6 +109,12 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.stefanbirkner</groupId>
+      <artifactId>system-lambda</artifactId>
+      <version>1.2.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>

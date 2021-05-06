@@ -1,10 +1,11 @@
 package uk.co.fivium.dmda.server;
 
 
+import com.github.stefanbirkner.systemlambda.SystemLambda;
 import org.junit.Before;
 import org.junit.Test;
-import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.TestUtil;
+import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionDetails;
 
 import java.util.Map;
 
@@ -64,6 +65,39 @@ public class TestSMTPConfig {
     catch (ConfigurationException e) {
       fail(GOOD_CONFIG_FAILED_TO_PARSE_ERROR_MSG);
     }
+  }
+
+  @Test
+  public void testAvConfig_envVars() throws Exception {
+    SystemLambda
+      .withEnvironmentVariable("DMDA_AV_MODE", "clamd")
+      .and("DMDA_AV_PORT", "3310")
+      .and("DMDA_AV_SERVER", "clamd_server")
+      .and("DMDA_AV_TIMEOUT_MS", "1000")
+      .execute(() -> {
+        mConfig.loadConfig(TestUtil.getTestResourceFile("no_av_config.xml", this.getClass()));
+        assertEquals("clamd", mConfig.getAVMode());
+        assertEquals("clamd_server", mConfig.getAVServer());
+        assertEquals(3310, mConfig.getAVPort());
+        assertEquals(1000, mConfig.getAVTimeoutMS());
+      });
+  }
+
+  @Test
+  public void testAvConfig_envVars_configSourcePrecedence() throws Exception {
+    SystemLambda
+      .withEnvironmentVariable("DMDA_AV_MODE", "clamd")
+      .and("DMDA_AV_PORT", "1234")
+      .and("DMDA_AV_SERVER", "env.example.com")
+      .and("DMDA_AV_TIMEOUT_MS", "3000")
+      .execute(() -> {
+        mConfig.loadConfig(TestUtil.getTestResourceFile("well_populated_config.xml", this.getClass()));
+        // AV config from env should be sourced over those in the config file
+        assertEquals("clamd", mConfig.getAVMode());
+        assertEquals("env.example.com", mConfig.getAVServer());
+        assertEquals(1234, mConfig.getAVPort());
+        assertEquals(3000, mConfig.getAVTimeoutMS());
+      });
   }
 
   @Test

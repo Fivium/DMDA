@@ -23,6 +23,22 @@ folder you run the following command:
 
 `java -jar ./target/dmda-x.x-SNAPSHOT-jar-with-dependencies.jar`
 
+
+Configuration
+--------------------------------------
+All application configuration is defined in the `config.xml` file, with the exception of anti-virus connection information which can also be configured via the following environment variables.
+
+|Name|Description|
+|---|---|
+|`DMDA_AV_MODE`|The anti-virus mode. One of `clamd` or `none`.|
+|`DMDA_AV_SERVER`|The anti-virus server hostname.|
+|`DMDA_AV_PORT`|The anti-virus server port.|
+|`DMDA_AV_TIMEOUT_MS`|The anti-virus scan timeout in milliseconds.|
+
+If anti-virus configuration exists in both environment variables and the XML config file, the configuration options set in the environment variables will take precedence.
+
+See the [sample config file](https://github.com/Fivium/DMDA/blob/master/config.xml.sample) for all other options.
+
 Health Checks
 --------------------------------------
 DMDA provides the following basic application health checks, which can be queried over HTTP.
@@ -39,22 +55,3 @@ Note that these endpoints should only be exposed locally to monitoring tools suc
 Requirements
 --------------------------------------
 - Java : >=1.8
-
-Building
---------------------------------------
-Due to Oracle licensing terms DMDA cannot re-distribute the Oracle JDBC jar files needed for building DMDA.
-Instead you need to have a valid Oracle Database install to get the Oracle JDBC jar available in the following 
-location, depending upon Oracle version:
-
-**Oracle 11g**: `$ORACLE_HOME/jdbc/lib/ojdbc6.jar`
-
-**Oracle 12c**: `$ORACLE_HOME/jdbc/lib/ojdbc6.jar`
-
-Once you have the jar you should add it to your local maven install using the following command:
-
-`mvn install:install-file 
-  -Dfile=ojdbc6.jar 
-  -DgroupId=com.oracle.jdbc 
-  -DartifactId=ojdbc6 
-  -Dversion=11.2.0.4 
-  -Dpackaging=jar`

@@ -1,8 +1,5 @@
 package uk.co.fivium.dmda.server;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.Comparator;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -39,10 +36,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Singleton for parsing and holding configuration data for DMDA
  */
 public class SMTPConfig {
+  private static final Logger LOGGER = Logger.getLogger(SMTPConfig.class);
   public static final int BYTES_IN_MEGABYTE = 1000 * 1000;
 
   private static final SMTPConfig gSMTPConfig  = new SMTPConfig();
@@ -112,13 +112,43 @@ public class SMTPConfig {
 
   private void loadAVConfig(Element pRootElement)
   throws ConfigurationException {
-    Element lAVConfig = getUniqueChildElement(pRootElement, "anti_virus");
-    mAVMode = getUniqueChildNodeText(lAVConfig, "mode");
+    String lEnvAVMode = System.getenv("DMDA_AV_MODE");
+    Optional<Element> lXmlAVConfig = getUniqueChildElementIfExists(pRootElement, "anti_virus");
 
+    if (lEnvAVMode != null) {
+      if (lXmlAVConfig.isPresent()) {
+        LOGGER.warn("Anti-virus config found in both environment variables and XML config file. Environment variables will take precedence.");
+      }
+      loadAVConfigFromEnv(lEnvAVMode);
+    }
+    else if (lXmlAVConfig.isPresent()){
+      loadAVConfigFromXML(lXmlAVConfig.get());
+    }
+    else {
+      throw new ConfigurationException("No anti-virus configuration found in environment variables or XML config");
+    }
+  }
+
+  private void loadAVConfigFromEnv(String pAVMode)
+  throws ConfigurationException {
+    mAVMode = pAVMode;
     if (AVModes.CLAM.getText().equals(mAVMode)) {
-      mAVPort = getUniqueChildNodeInt(lAVConfig, "port");
-      mAVServer = getUniqueChildNodeText(lAVConfig, "server");
-      mAVTimeoutMS = getUniqueChildNodeInt(lAVConfig, "timeout_ms");
+      mAVPort = getEnvVarInt("DMDA_AV_PORT");
+      mAVServer = getEnvVar("DMDA_AV_SERVER");
+      mAVTimeoutMS = getEnvVarInt("DMDA_AV_TIMEOUT_MS");
+    }
+    else if (!AVModes.NONE.getText().equals(mAVMode)){
+      throw new ConfigurationException("Unknown anti-virus mode " + mAVMode);
+    }
+  }
+
+  private void loadAVConfigFromXML(Element pAVConfigElement)
+  throws ConfigurationException {
+    mAVMode = getUniqueChildNodeText(pAVConfigElement, "mode");
+    if (AVModes.CLAM.getText().equals(mAVMode)) {
+      mAVPort = getUniqueChildNodeInt(pAVConfigElement, "port");
+      mAVServer = getUniqueChildNodeText(pAVConfigElement, "server");
+      mAVTimeoutMS = getUniqueChildNodeInt(pAVConfigElement, "timeout_ms");
     }
     else if (!AVModes.NONE.getText().equals(mAVMode)){
       throw new ConfigurationException("Unknown anti-virus mode " + mAVMode);
@@ -465,6 +495,20 @@ public class SMTPConfig {
   private int getUniqueChildNodeInt(Element pElement, String pChildTagName)
   throws ConfigurationException {
     return Integer.parseInt(getUniqueChildNodeText(pElement, pChildTagName));
+  }
+
+  private String getEnvVar(String pEnvVarName)
+    throws ConfigurationException {
+    String lVar = System.getenv(pEnvVarName);
+    if (lVar == null) {
+      throw new ConfigurationException("Environment variable " + pEnvVarName + " not set");
+    }
+    return lVar;
+  }
+
+  private int getEnvVarInt(String pEnvVarName)
+    throws ConfigurationException {
+    return Integer.parseInt(getEnvVar(pEnvVarName));
   }
 
   /**

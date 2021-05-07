@@ -1,5 +1,5 @@
 Name:           dmda
-Version:        1.5
+Version:        1.6
 Release:        1
 Summary:        Database Mail Delivery Agent - A simple mail delivery agent designed to store email in a database backend
 
@@ -54,6 +54,8 @@ chmod u+x /etc/init.d/dmdad
 
 
 %changelog
+* Fri May 07 2021 James Barnett <james.barnett@fivium.co.uk> - 1.6
+- Anti-virus configurable via environment variables
 * Tue Jul 04 2017 James Barnett <james.barnett@fivium.co.uk> - 1.5
 - Added application health checks
 * Tue Jul 26 2016 Jonathan Poole <jon.poole@fivium.co.uk> - 1.4

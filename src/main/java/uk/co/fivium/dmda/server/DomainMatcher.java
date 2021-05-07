@@ -6,13 +6,10 @@ public class DomainMatcher{
     private String mDomain;
     private boolean mRegex;
     private String mDatabase;
-    private int mPriority;
-
-    public DomainMatcher(String pDomain, boolean pRegex, String pDatebase, int pPriority){
+    public DomainMatcher(String pDomain , boolean pRegex, String pDatebase){
         mDomain  = pDomain;
         mRegex = pRegex;
         mDatabase = pDatebase;
-        mPriority = pPriority;
     }
 
     public boolean match(String pDomain){
@@ -21,9 +18,5 @@ public class DomainMatcher{
 
     public String getDatabase(){
         return mDatabase;
-    }
-
-    public int getPriority() {
-        return mPriority;
     }
 }

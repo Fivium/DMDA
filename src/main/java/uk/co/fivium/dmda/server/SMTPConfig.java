@@ -68,7 +68,7 @@ public class SMTPConfig {
   private SMTPConfig(){}
 
   public boolean isValidRecipient(String lRecipientDomain) {
-    return !getDatabasesForRecipient(lRecipientDomain).isEmpty();
+    return getDatabaseForRecipient(lRecipientDomain) != null;
   }
 
   public static SMTPConfig getInstance() {
@@ -228,7 +228,7 @@ public class SMTPConfig {
 
   private List<DomainMatcher> parseRecipientDatabaseMapping(Document pRootDoc, Set<String> pDatabaseSet)
   throws ConfigurationException {
-    List<DomainMatcher> lRecipientDatabaseList = new ArrayList<>();
+    List<DomainMatcher> lRecipientDatabaseMap = new ArrayList<>();
 
     try {
       NodeList lRecipientNodeList = (NodeList) mXPath.evaluate("/*/recipient_list/recipient", pRootDoc.getDocumentElement(), XPathConstants.NODESET);
@@ -242,21 +242,10 @@ public class SMTPConfig {
 
           String lDomain;
           boolean lIsRegexDomain;
-          int lPriority = Integer.MAX_VALUE;
 
           XPath lXPath = XPathFactory.newInstance().newXPath();
           Node lDomainNode = (Node) lXPath.evaluate("./domain", lRecipientElement, XPathConstants.NODE);
           Node lDomainRegexNode = (Node) lXPath.evaluate("./domain_regex", lRecipientElement, XPathConstants.NODE);
-          Node lPriorityNode = (Node) lXPath.evaluate("./priority", lRecipientElement, XPathConstants.NODE);
-
-          if (lPriorityNode != null) {
-            try {
-              lPriority = Integer.parseInt(lPriorityNode.getTextContent());
-            } catch (NumberFormatException e) {
-              throw new ConfigurationException(
-                  String.format("Invalid priority value %s", lPriorityNode.getTextContent()), e);
-            }
-          }
 
           if (lDomainNode != null && lDomainRegexNode == null){
             lDomain = lDomainNode.getTextContent();
@@ -274,20 +263,20 @@ public class SMTPConfig {
             throw new ConfigurationException("Unknown database " + lDatabaseName);
           }
 
-          for (DomainMatcher lDomainMatcher : lRecipientDatabaseList){
+          for (DomainMatcher lDomainMatcher : lRecipientDatabaseMap){
             if (lDomain.equals(lDomainMatcher.getDatabase())){
               throw new ConfigurationException("Duplicate recipient " + lDomain);
             }
           }
 
-          lRecipientDatabaseList.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName, lPriority));
+          lRecipientDatabaseMap.add(new DomainMatcher(lDomain, lIsRegexDomain, lDatabaseName));
         }
         else {
           throw new ConfigurationException("Invalid recipient XML");
         }
       }
 
-      return lRecipientDatabaseList;
+      return lRecipientDatabaseMap;
     }
     catch (XPathExpressionException ex) {
       throw new ConfigurationException("XPath error loading recipient list", ex);
@@ -512,25 +501,18 @@ public class SMTPConfig {
   }
 
   /**
-   * Returns the databases configured for the given destination domain
+   * Returns the database configured for the given destination domain
    *
    * @param pRecipientDomain Domain that maps to a database
-   * @return a list of databases configured for the given destination domain
+   * @return the database configured for the given destination domain
    */
-  public List<String> getDatabasesForRecipient(String pRecipientDomain) {
-    List<DomainMatcher> lMatchedMatchers = mRecipientDatabaseMapping.stream()
-        .filter(matcher -> matcher.match(pRecipientDomain))
-        .collect(toList());
-
-    Integer lowestPriority = lMatchedMatchers.stream()
-        .map(DomainMatcher::getPriority)
-        .min(Integer::compareTo)
-        .orElse(Integer.MAX_VALUE);
-
-    return lMatchedMatchers.stream()
-        .filter(matcher -> matcher.getPriority() <= lowestPriority)
-        .map(DomainMatcher::getDatabase)
-        .collect(toList());
+  public String getDatabaseForRecipient(String pRecipientDomain) {
+    for (DomainMatcher lMatcher : mRecipientDatabaseMapping){
+      if(lMatcher.match(pRecipientDomain)){
+        return lMatcher.getDatabase();
+      }
+    }
+    return null;
   }
 
   /**

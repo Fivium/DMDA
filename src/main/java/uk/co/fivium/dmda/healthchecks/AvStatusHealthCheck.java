@@ -1,7 +1,8 @@
 package uk.co.fivium.dmda.healthchecks;
 
 import fi.iki.elonen.NanoHTTPD;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.fivium.dmda.antivirus.AVScannerFactory;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class AvStatusHealthCheck implements HealthCheck {
       lIsAvRunning = true;
     }
     catch (IOException ex) {
-      Logger.getRootLogger().info("Error when testing AV service.");
+      LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).info("Error when testing AV service.");
     }
 
     if (lIsAvRunning) {

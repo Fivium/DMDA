@@ -1,14 +1,7 @@
 package uk.co.fivium.dmda.server;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,8 +9,6 @@ import org.w3c.dom.NodeList;
 import uk.co.fivium.dmda.antivirus.AVModes;
 import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.server.enumerations.BindParams;
-import uk.co.fivium.dmda.server.enumerations.LoggingLevels;
-import uk.co.fivium.dmda.server.enumerations.LoggingModes;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,21 +27,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.stream.Collectors.toList;
-
 /**
  * Singleton for parsing and holding configuration data for DMDA
  */
 public class SMTPConfig {
-  private static final Logger LOGGER = Logger.getLogger(SMTPConfig.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SMTPConfig.class);
   public static final int BYTES_IN_MEGABYTE = 1000 * 1000;
 
   private static final SMTPConfig gSMTPConfig  = new SMTPConfig();
 
   private XPath mXPath = XPathFactory.newInstance().newXPath();
   private int mSmtpPort;
-  private String mLoggingLevel;
-  private String mLoggingMode;
   private List<DomainMatcher> mRecipientDatabaseMapping;
   private Map<String, DatabaseConnectionDetails> mDatabaseConnectionDetailsMap;
   private String mEmailRejectionMessage;
@@ -88,8 +75,6 @@ public class SMTPConfig {
       Element lRootElement = lRootDoc.getDocumentElement();
 
       mSmtpPort = getUniqueChildNodeInt(lRootElement, "port");
-      mLoggingLevel = getUniqueChildNodeText(lRootElement, "logging_level");
-      mLoggingMode = getUniqueChildNodeText(lRootElement, "logging_mode");
       mEmailRejectionMessage = getUniqueChildNodeText(lRootElement, "email_rejection_message");
       mMessageSizeLimit = BYTES_IN_MEGABYTE * getUniqueChildNodeInt(lRootElement, "message_size_limit_mb");
 
@@ -99,8 +84,6 @@ public class SMTPConfig {
       loadAVConfig(lRootElement);
 
       loadHealthCheckConfig(lRootElement);
-
-      configureLoggingFromConfig();
     }
     catch (ConfigurationException ex) {
       throw ex;
@@ -283,67 +266,9 @@ public class SMTPConfig {
     }
   }
 
-  private void configureLoggingFromConfig()
-  throws ConfigurationException {
-    SMTPConfig lSMTPConfig = SMTPConfig.getInstance();
-    String lLoggingMode = lSMTPConfig.getLoggingMode();
-
-    if (LoggingModes.FILE.getText().equals(lLoggingMode)){
-      FileAppender lFileAppender = new FileAppender();
-      lFileAppender.setFile("logs/dmda.log");
-      lFileAppender.activateOptions();
-      configureLoggingWithAppender(lFileAppender);
-    }
-    else if (LoggingModes.CONSOLE.getText().equals(lLoggingMode)){
-      ConsoleAppender lConsoleAppender = new ConsoleAppender();
-      lConsoleAppender.activateOptions();
-      configureLoggingWithAppender(lConsoleAppender);
-    }
-    else if(!LoggingModes.NONE.getText().equals(lLoggingMode)){
-      if(lLoggingMode.endsWith(".xml")){
-        DOMConfigurator.configure(lLoggingMode);
-      }
-      else if(lLoggingMode.endsWith(".properties")){
-        PropertyConfigurator.configure(lLoggingMode);
-      }
-      else {
-        throw new ConfigurationException("Logging mode " + lLoggingMode + " is not a valid logging mode");
-      }
-    }
-  }
-
-  private void configureLoggingWithAppender(Appender pAppender){
-    SMTPConfig lSMTPConfig = SMTPConfig.getInstance();
-    String lLoggingLevel = lSMTPConfig.getLoggingLevel();
-    Logger lRootLogger = Logger.getRootLogger();
-
-    Layout lLayout = new PatternLayout("%d{dd-MMM-yyyy HH:mm} %5p [%t] %m%n");
-    pAppender.setLayout(lLayout);
-
-    lRootLogger.removeAllAppenders();
-    lRootLogger.addAppender(pAppender);
-
-    if (LoggingLevels.DEBUG.getText().equals(lLoggingLevel)) {
-      lRootLogger.setLevel(Level.DEBUG);
-    }
-    else if (LoggingLevels.ERROR.getText().equals(lLoggingLevel)) {
-      lRootLogger.setLevel(Level.ERROR);
-    }
-    else if (LoggingLevels.INFO.getText().equals(lLoggingLevel)){
-      lRootLogger.setLevel(Level.INFO);
-    }
-    else {
-      lRootLogger.setLevel(Level.INFO);
-      lRootLogger.error("Unknown logging level " + lLoggingLevel + ", defaulting to info.");
-    }
-  }
 
   public int getSmtpPort() {
     return mSmtpPort;
-  }
-
-  public String getLoggingLevel() {
-    return mLoggingLevel;
   }
 
   public String getEmailRejectionMessage(){
@@ -534,13 +459,4 @@ public class SMTPConfig {
     return mDatabaseConnectionDetailsMap.get(pDatabaseName);
   }
 
-  /**
-   * Returns a set of all configured recipients
-   *
-   * @return A set of all configured recipients
-   */
-
-  public String getLoggingMode() {
-    return mLoggingMode;
-  }
 }

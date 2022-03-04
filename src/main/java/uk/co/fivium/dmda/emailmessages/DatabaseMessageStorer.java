@@ -2,13 +2,14 @@ package uk.co.fivium.dmda.emailmessages;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OraclePreparedStatement;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.subethamail.smtp.RejectException;
 import org.w3c.dom.Document;
 import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionDetails;
 import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionHandler;
-import uk.co.fivium.dmda.server.enumerations.BindParams;
 import uk.co.fivium.dmda.server.SMTPConfig;
+import uk.co.fivium.dmda.server.enumerations.BindParams;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -19,13 +20,15 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class DatabaseMessageStorer implements MessageStorer{
   private SMTPConfig mSMTPConfig;
-  private Logger mLogger = Logger.getLogger(DatabaseMessageStorer.class);
+  private Logger mLogger = LoggerFactory.getLogger(DatabaseMessageStorer.class);
 
   public DatabaseMessageStorer(){
     mSMTPConfig = SMTPConfig.getInstance();

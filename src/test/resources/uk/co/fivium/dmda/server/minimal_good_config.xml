@@ -2,10 +2,6 @@
 <smtp_config>
     <!-- The port the server will listen on. Default 2601. -->
     <port>2601</port>
-    <!-- Logging level can be set to debug, info or error -->
-    <logging_level>info</logging_level>
-    <!-- Logging mode can be set to console or file -->
-    <logging_mode>console</logging_mode>
     <!-- The generic message that is used when an email is rejected -->
     <email_rejection_message>An unexpected error has occurred and your email has not been received. Please try again
         later.

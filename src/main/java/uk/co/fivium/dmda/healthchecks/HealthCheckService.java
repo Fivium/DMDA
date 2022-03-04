@@ -1,7 +1,8 @@
 package uk.co.fivium.dmda.healthchecks;
 
 import fi.iki.elonen.NanoHTTPD;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.fivium.dmda.server.SMTPConfig;
 import uk.co.fivium.dmda.server.ServerStartupException;
 
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class HealthCheckService extends NanoHTTPD {
+
+  private static final Logger LOGGER  = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
   private Map<String, HealthCheck> mHealthChecks = new HashMap<>();
 
@@ -63,12 +66,12 @@ public class HealthCheckService extends NanoHTTPD {
         }
       }
       else {
-        Logger.getRootLogger().warn("No health check registered for URI: " + pSession.getUri());
+        LOGGER.warn("No health check registered for URI: " + pSession.getUri());
         return newFixedLengthResponse(Response.Status.NOT_FOUND, NanoHTTPD.MIME_PLAINTEXT, "");
       }
     }
     catch (Exception ex) {
-      Logger.getRootLogger().warn("Error during health check request for URI: " + pSession.getUri(), ex);
+      LOGGER.warn("Error during health check request for URI: " + pSession.getUri(), ex);
       return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "");
     }
   }
@@ -99,7 +102,7 @@ public class HealthCheckService extends NanoHTTPD {
   public void startHealthCheckService() throws ServerStartupException {
     try {
       super.start();
-      Logger.getRootLogger().info("Health check service started, listening on port: " + super.getListeningPort());
+      LOGGER.info("Health check service started, listening on port: " + super.getListeningPort());
     }
     catch (IOException ex) {
       throw new ServerStartupException("Failed to start health check service.", ex);
@@ -107,9 +110,9 @@ public class HealthCheckService extends NanoHTTPD {
   }
 
   public void stopHealthCheckService() {
-    Logger.getRootLogger().info("Stopping health check service...");
+    LOGGER.info("Stopping health check service...");
     super.stop();
-    Logger.getRootLogger().info("Health check service stopped.");
+    LOGGER.info("Health check service stopped.");
   }
 
 }

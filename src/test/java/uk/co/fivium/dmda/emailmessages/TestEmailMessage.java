@@ -1,12 +1,13 @@
 package uk.co.fivium.dmda.emailmessages;
 
-import org.apache.log4j.lf5.util.StreamUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.subethamail.smtp.RejectException;
+import uk.co.fivium.dmda.TestUtil;
 import uk.co.fivium.dmda.server.ConfigurationException;
 import uk.co.fivium.dmda.server.SMTPConfig;
-import uk.co.fivium.dmda.TestUtil;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
@@ -14,7 +15,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class TestEmailMessage {
 
@@ -104,7 +109,7 @@ public class TestEmailMessage {
     Attachment lBody = mAttachments.get(0);  // The first attachment should be the body
 
     assertEquals(lBody.getTextContent(), "Hello Mr/Mrs From,\r\n\r\nMessage body goes here\r\n\r\n\r\nThanks,\r\n\r\nMr User\r\n");
-    assertEquals(lBody.getTextContent(), new String(StreamUtils.getBytes(lBody.getDataStream())));
+    assertEquals(lBody.getTextContent(), new String(IOUtils.toByteArray(lBody.getDataStream())));
     assertTrue(lBody.getContentType().startsWith("text/plain"));
     assertNull(lBody.getDisposition());
 

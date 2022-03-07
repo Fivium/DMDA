@@ -1,7 +1,8 @@
 package uk.co.fivium.dmda.databaseconnection;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.fivium.dmda.server.SMTPConfig;
 
 import java.sql.Connection;
@@ -102,7 +103,7 @@ public class DatabaseConnectionHandler {
         lIsValid = lConnection.isValid(5);
       }
       catch (SQLException ex) {
-        Logger.getRootLogger().warn("Exception when testing database connection '" + lDatabaseIdentifier + "'.", ex);
+        LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).warn("Exception when testing database connection '" + lDatabaseIdentifier + "'.", ex);
         lIsValid = false;
       }
 

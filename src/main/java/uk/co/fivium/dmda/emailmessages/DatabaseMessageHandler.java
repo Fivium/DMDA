@@ -1,11 +1,11 @@
 package uk.co.fivium.dmda.emailmessages;
 
-import uk.co.fivium.dmda.server.SMTPConfig;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.subethamail.smtp.MessageContext;
 import org.subethamail.smtp.MessageHandler;
 import org.subethamail.smtp.RejectException;
+import uk.co.fivium.dmda.server.SMTPConfig;
 
 import java.io.InputStream;
 import java.util.UUID;
@@ -22,7 +22,7 @@ implements MessageHandler {
   public DatabaseMessageHandler(DatabaseMessageStorer pStorer, MessageContext pMessageContext) {
     mUUID = UUID.randomUUID();
     mMessageStorer = pStorer;
-    mLogger = LogManager.getLogger(DatabaseMessageHandler.class);
+    mLogger = LoggerFactory.getLogger(DatabaseMessageHandler.class);
     Thread.currentThread().setName("MessageHandler." + mUUID.toString());
     mEmailMessage = new EmailMessage(mUUID.toString());
 

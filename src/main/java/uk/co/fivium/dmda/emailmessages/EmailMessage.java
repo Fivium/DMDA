@@ -1,7 +1,8 @@
 package uk.co.fivium.dmda.emailmessages;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.util.StreamUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.subethamail.smtp.MessageContext;
 import org.subethamail.smtp.RejectException;
 import org.w3c.dom.Document;
@@ -45,7 +46,7 @@ public class EmailMessage {
   private Document mHeaderXML;
   private Date mSentDate;
 
-  private Logger mLogger = Logger.getLogger(DatabaseMessageHandler.class);
+  private Logger mLogger = LoggerFactory.getLogger(DatabaseMessageHandler.class);
   private SMTPConfig mSMTPConfig;
   private String mMailId;
   private String mRemoteHostname;
@@ -184,14 +185,14 @@ public class EmailMessage {
     }
     else if (lContent instanceof InputStream) {
       InputStream lDataStream = (InputStream) lContent;
-      byte[] lData = StreamUtils.getBytes(lDataStream);
+      byte[] lData = IOUtils.toByteArray(lDataStream);
       lAttachment.setData(lData);
     }
     else {
       /* Message attachments could be multi part themselves or be another message entirely. For our purposes, we don't
        * need to handle these cases.
        */
-      lAttachment.setData(StreamUtils.getBytes(pPart.getInputStream()));
+      lAttachment.setData(IOUtils.toByteArray(pPart.getInputStream()));
       mLogger.warn("Email has a nested attachment which is not implemented yet" + toString());
     }
 

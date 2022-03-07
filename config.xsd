@@ -4,16 +4,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="port" type="xs:integer"/>
-        <xs:element name="logging_level">
-          <xs:simpleType>
-            <xs:restriction base="xs:string">
-              <xs:enumeration value="debug"/>
-              <xs:enumeration value="info"/>
-              <xs:enumeration value="error"/>
-            </xs:restriction>
-          </xs:simpleType>
-        </xs:element>
-        <xs:element name="logging_mode" type="xs:string"/>
         <xs:element name="email_rejection_message" type="xs:string"/>
         <xs:element name="message_size_limit_mb" type="xs:integer"/>
         <xs:element name="anti_virus">

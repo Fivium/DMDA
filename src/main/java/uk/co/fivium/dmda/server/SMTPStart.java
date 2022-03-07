@@ -1,14 +1,14 @@
 package uk.co.fivium.dmda.server;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.fivium.dmda.antivirus.AVScannerFactory;
 import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionException;
 import uk.co.fivium.dmda.databaseconnection.DatabaseConnectionHandler;
-import uk.co.fivium.dmda.healthchecks.SMTPStatusHealthCheck;
 import uk.co.fivium.dmda.healthchecks.AvStatusHealthCheck;
 import uk.co.fivium.dmda.healthchecks.DatabaseStatusHealthCheck;
 import uk.co.fivium.dmda.healthchecks.HealthCheckService;
+import uk.co.fivium.dmda.healthchecks.SMTPStatusHealthCheck;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +27,12 @@ public class SMTPStart {
   }
 
   public void start(){
-    BasicConfigurator.configure(); // Enable some sort of basic logging
     try {
       loadServerConfiguration();
       startSMTPServer();
     }
     catch (Exception ex){
-      Logger.getRootLogger().error("Error during startup. Server shutting down.", ex);
+      LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).error("Error during startup. Server shutting down.", ex);
     }
   }
 
@@ -41,7 +40,7 @@ public class SMTPStart {
     DatabaseConnectionHandler.getInstance().shutDown();
     mSMTPServer.stop();
     mHealthCheckService.stopHealthCheckService();
-    Logger.getRootLogger().info("Shutdown signal received. Server shutting down.");
+    LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME).info("Shutdown signal received. Server shutting down.");
   }
 
   private void startSMTPServer()

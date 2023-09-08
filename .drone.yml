@@ -34,6 +34,7 @@ steps:
     when:
       branch:
         - master
+        - master-auto
         - feature/**
 
   - name: sync-reports

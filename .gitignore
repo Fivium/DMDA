@@ -62,3 +62,10 @@ crashlytics-build.properties
 logs/
 log.properties
 log.xml
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/

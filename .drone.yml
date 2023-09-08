@@ -1,0 +1,70 @@
+kind: pipeline
+name: default
+type: docker
+
+steps:
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./gradle_cache
+
+  - name: build-java
+    image: eclipse-temurin:17-jdk
+    environment:
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew test shadowJar
+
+  - name: publish
+    image: plugins/docker:19.03.8
+    settings:
+      registry: quay.io
+      repo: quay.io/fivium/dmda
+      tags:
+        - ${DRONE_BRANCH//\//-}-${DRONE_BUILD_NUMBER}
+      config:
+        from_secret: docker_config
+    when:
+      branch:
+        - master
+        - feature/**
+
+  - name: sync-reports
+    image: alpine:3
+    commands:
+      - mkdir -p /var/webfiles/${DRONE_BUILD_NUMBER}
+      - cp -r build/reports /var/webfiles/${DRONE_BUILD_NUMBER}
+    volumes:
+      - name: webfiles
+        path: /var/webfiles
+    when:
+      status: [ success, failure ]
+
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./gradle_cache
+
+volumes:
+  - name: webfiles
+    host:
+      path: /home/fivium/www/dmda
+  - name: drone-cache
+    host:
+      path: /home/fivium/drone-cache
+
+---
+kind: secret
+name: docker_config_json
+data: PoK0OAmT3gPGRPwx/I3Bb19pKUxCTiFhASs3/ItJxinc0WRWFUqbYE/hhgdkYnoTDIh839y3jN5NwB6U6x9up6cLZ2aXNWXs4BLxbCjhmUuNJXZpS3voYWdlDhFrslV+84DSLIQKCJogQfEgwuWtN5NgEHl/qoxN3IEboKK38lM8NHSRAChnPm8Oz4M5ocV47SCIXVchmQHdaidZOvRW6Mi1Lm9ktEewIzldzP+H0gnaXs2x3clgY2jxs2ugl77ClT0X3icvb1SqNgYZB7GIt0ieks5UPXfzQ5sZj/ItJz+YVqCSWMfCb/3XECj/ipB8bKHUa5UgRiTp3uAcBJYcIqR8S2ubdA==

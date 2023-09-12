@@ -36,6 +36,8 @@ steps:
         - master
         - master-auto
         - feature/**
+      event:
+        - push
 
   - name: sync-reports
     image: alpine:3

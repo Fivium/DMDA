@@ -1,0 +1,51 @@
+plugins {
+	id 'java'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'uk.co.fivium'
+version = 'SNAPSHOT'
+
+java {
+	sourceCompatibility = '8'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation (
+		'fi.solita.clamav:clamav-client:1.0.1',
+		'com.zaxxer:HikariCP-java6:2.3.13',
+		'ch.qos.logback:logback-classic:1.2.12',
+		'commons-io:commons-io:2.12.0',
+		'org.subethamail:subethasmtp:3.1.7',
+		'com.oracle.database.jdbc:ojdbc6:11.2.0.4',
+		'org.nanohttpd:nanohttpd:2.3.1'
+	)
+	testImplementation (
+		'junit:junit:4.13.2',
+		'com.github.stefanbirkner:system-lambda:1.2.0'
+	)
+}
+
+shadowJar {
+	archiveFileName.set("${rootProject.name}.jar")
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class': 'uk.co.fivium.dmda.server.SMTPStart'
+	}
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+test {
+	// hack to get https://github.com/stefanbirkner/system-lambda working with Java 11+
+	// should really be removed and replaced with proper ITs
+	jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
+}

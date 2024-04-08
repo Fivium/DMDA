@@ -127,7 +127,12 @@ public class EmailMessage {
 
       while(lHeaderEnumeration.hasMoreElements()){
         Header lCurrentHeader = Header.class.cast(lHeaderEnumeration.nextElement());
-        mHeaderMap.put(lCurrentHeader.getName(), decodeHeaderValue(lCurrentHeader));
+        try {
+          mHeaderMap.put(lCurrentHeader.getName(), decodeHeaderValue(lCurrentHeader));
+        }
+        catch(MessagingException ex) {
+          mLogger.warn("Failed to decode header value for (" + lCurrentHeader.getName() + ")" + toString(), ex);
+        }
       }
 
       stripAttachments(lMimeMessage);

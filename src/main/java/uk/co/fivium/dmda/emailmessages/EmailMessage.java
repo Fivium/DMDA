@@ -131,7 +131,7 @@ public class EmailMessage {
           mHeaderMap.put(lCurrentHeader.getName(), decodeHeaderValue(lCurrentHeader));
         }
         catch(MessagingException ex) {
-          mLogger.warn("Failed to decode header value for (" + lCurrentHeader.getName() + ")" + toString(), ex);
+          mLogger.warn("Failed to decode value for header {}", lCurrentHeader.getName(), ex);
         }
       }
 

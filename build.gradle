@@ -18,15 +18,15 @@ dependencies {
 	implementation (
 		'fi.solita.clamav:clamav-client:1.0.1',
 		'com.zaxxer:HikariCP-java6:2.3.13',
-		'ch.qos.logback:logback-classic:1.2.12',
-		'commons-io:commons-io:2.12.0',
+		'ch.qos.logback:logback-classic:1.5.4',
+		'commons-io:commons-io:2.16.1',
 		'org.subethamail:subethasmtp:3.1.7',
 		'com.oracle.database.jdbc:ojdbc6:11.2.0.4',
 		'org.nanohttpd:nanohttpd:2.3.1'
 	)
 	testImplementation (
 		'junit:junit:4.13.2',
-		'com.github.stefanbirkner:system-lambda:1.2.0'
+		'com.github.stefanbirkner:system-lambda:1.2.1'
 	)
 }
 

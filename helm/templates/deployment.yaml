@@ -59,6 +59,9 @@ spec:
               readOnly: true
       volumes:
         - name: dmda-config
-          configMap:
-            name: dmda-config
+          secret:
+            secretName: {{ .Chart.Name }}
+            items:
+              - key: config.xml
+                path: config.xml
 

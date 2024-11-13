@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.global.shared.namespace }}
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        netpol.ingress.nginx: "true"
+        netpol.egress.database: "true"
+        netpol.egress.clamav: "true"
+    spec:
+      priorityClassName: medium
+      enableServiceLinks: false
+      imagePullSecrets:
+        - name: quay.io
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: {{ .Chart.Name }}
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "quay.io/fivium/dmda:{{ .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 2601
+          resources:
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+          command:
+            - java
+            - {{ .Values.additionalJavaOpts }}
+            - "-jar"
+            - dmda.jar
+          volumeMounts:
+            - name: dmda-config
+              mountPath: "/opt/dmda/config.xml"
+              subPath: "config.xml"
+              readOnly: true
+      volumes:
+        - name: dmda-config
+          configMap:
+            name: dmda-config
+

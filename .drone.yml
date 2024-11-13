@@ -39,6 +39,38 @@ steps:
       event:
         - push
 
+  - name: publish-helm-chart-master-auto
+    image: quay.io/fivium/drone-helm
+    settings:
+      chart_name: dmda
+      chart_version: 0.${DRONE_BUILD_NUMBER}.0
+      app_version: master-auto-${DRONE_BUILD_NUMBER}
+    environment:
+      AWS_ACCESS_KEY_ID: AKIA4K4CXHTZ7KAUZJWL
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+    when:
+      branch:
+        - master-auto
+      status:
+        - success
+
+  - name: publish-helm-chart-master
+    image: quay.io/fivium/drone-helm
+    settings:
+      chart_name: dmda
+      chart_version: ${DRONE_BUILD_NUMBER}.0.0
+      app_version: master-${DRONE_BUILD_NUMBER}
+    environment:
+      AWS_ACCESS_KEY_ID: AKIA4K4CXHTZ7KAUZJWL
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+    when:
+      branch:
+        - master
+      status:
+        - success
+
   - name: sync-reports
     image: alpine:3
     commands:
@@ -72,3 +104,8 @@ volumes:
 kind: secret
 name: docker_config
 data: PoK0OAmT3gPGRPwx/I3Bb19pKUxCTiFhASs3/ItJxinc0WRWFUqbYE/hhgdkYnoTDIh839y3jN5NwB6U6x9up6cLZ2aXNWXs4BLxbCjhmUuNJXZpS3voYWdlDhFrslV+84DSLIQKCJogQfEgwuWtN5NgEHl/qoxN3IEboKK38lM8NHSRAChnPm8Oz4M5ocV47SCIXVchmQHdaidZOvRW6Mi1Lm9ktEewIzldzP+H0gnaXs2x3clgY2jxs2ugl77ClT0X3icvb1SqNgYZB7GIt0ieks5UPXfzQ5sZj/ItJz+YVqCSWMfCb/3XECj/ipB8bKHUa5UgRiTp3uAcBJYcIqR8S2ubdA==
+
+---
+kind: secret
+name: aws_secret_access_key
+data: rOhSJ7/HYVXu6ZLnG77zZIeJ12QHs2VXpU5YFPvLUrigOUzuVikrPHJNt1yzzSH2n+vgmrV8dxh2Ky4+vCdOG5SOhX4=

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "replicas",
+    "resources",
+    "databases",
+    "additionalJavaOpts",
+    "global"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "global": {},
+    "replicas": {
+      "type": "number"
+    },
+    "resources": {
+      "type": "object",
+      "required": [
+        "limits",
+        "requests"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "limits": {
+          "type": "object",
+          "required": [
+            "memory",
+            "cpu"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "type": "string"
+            },
+            "cpu": {
+              "type": "string"
+            }
+          }
+        },
+        "requests": {
+          "type": "object",
+          "required": [
+            "memory",
+            "cpu"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "memory": {
+              "type": "string"
+            },
+            "cpu": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "databases": {
+      "type": "array"
+    },
+    "additionalJavaOpts": {
+      "type": "string"
+    }
+  }
+}

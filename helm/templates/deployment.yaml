@@ -49,7 +49,10 @@ spec:
               cpu: {{ .Values.resources.requests.cpu }}
           command:
             - java
-            - {{ .Values.additionalJavaOpts }}
+            {{- $opts := split " " .Values.additionalJavaOpts }}
+            {{- range $opts }}
+            - {{ . }}
+            {{- end }}
             - "-jar"
             - dmda.jar
           volumeMounts:

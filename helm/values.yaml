@@ -4,6 +4,6 @@ resources:
     memory: 512M
     cpu: 500m
   requests:
-    memory: 320M
+    memory: 512M
     cpu: 100m
 additionalJavaOpts: -Xmx150m -XX:+ExitOnOutOfMemoryError

@@ -52,6 +52,8 @@ steps:
     when:
       branch:
         - master-auto
+      event:
+        - push
       status:
         - success
 
@@ -68,6 +70,8 @@ steps:
     when:
       branch:
         - master
+      event:
+        - push
       status:
         - success
 

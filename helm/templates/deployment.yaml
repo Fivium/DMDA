@@ -47,6 +47,11 @@ spec:
             requests:
               memory: {{ .Values.resources.requests.memory }}
               cpu: {{ .Values.resources.requests.cpu }}
+          env:
+            {{- range .Values.additionalEnvVars }}
+            - name: {{ .name }}
+              value: {{ quote .value }}
+            {{- end }}
           command:
             - java
             {{- $opts := split " " .Values.additionalJavaOpts }}

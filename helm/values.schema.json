@@ -8,7 +8,7 @@
     "additionalJavaOpts",
     "global"
   ],
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "global": {},
     "replicas": {
@@ -20,7 +20,7 @@
         "limits",
         "requests"
       ],
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "limits": {
           "type": "object",
@@ -28,7 +28,7 @@
             "memory",
             "cpu"
           ],
-          "additionalProperties": false,
+          "additionalProperties": true,
           "properties": {
             "memory": {
               "type": "string"
@@ -44,7 +44,7 @@
             "memory",
             "cpu"
           ],
-          "additionalProperties": false,
+          "additionalProperties": true,
           "properties": {
             "memory": {
               "type": "string"

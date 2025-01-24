@@ -1,0 +1,14 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.global.shared.namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: mail-in
+            io.kubernetes.pod.namespace: common

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dmda
+description: A Helm chart for DMDA
+
+type: application
+version: 0.0.0 # Overridden by Drone
+appVersion: "" # Overridden by Drone

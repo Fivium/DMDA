@@ -57,24 +57,6 @@ steps:
       status:
         - success
 
-  - name: publish-helm-chart-master
-    image: quay.io/fivium/drone-helm
-    settings:
-      chart_name: dmda
-      chart_version: ${DRONE_BUILD_NUMBER}.0.0
-      app_version: master-${DRONE_BUILD_NUMBER}
-    environment:
-      AWS_ACCESS_KEY_ID: AKIA4K4CXHTZ7KAUZJWL
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: aws_secret_access_key
-    when:
-      branch:
-        - master
-      event:
-        - push
-      status:
-        - success
-
   - name: sync-reports
     image: alpine:3
     commands:

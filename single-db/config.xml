@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smtp_config>
+  <!-- The port the server will listen on. 1024 and below will require root. -->
+  <port>2601</port>
+  <!-- The generic message that is used when an email is rejected -->
+  <email_rejection_message>An unexpected error has occurred and your email has not been received. Please try again later.</email_rejection_message>
+  <!-- The max size the message body can be in megabytes -->
+  <message_size_limit_mb>15</message_size_limit_mb>
+  <!-- AV can be disabled by setting the mode to 'none' -->
+  <anti_virus>
+    <mode>none</mode>
+  </anti_virus>
+  <!-- The list of databases. Databases have a many to 1 relationship with recipients. -->
+  <database_list>
+    <database>
+      <name>singleDb</name>
+      <!-- This is the same URL that clobber uses -->
+      <jdbc_url>$$JDBC_URL$$</jdbc_url>
+      <username>$$JDBC_USER$$</username>
+      <password>$$JDBC_PASSWORD$$</password>
+      <!--
+      This is the query the database will use to store the email in the database. The bind params are "mail_id"
+      , "repository", "from_address", "recipient", "remote_hostname", "remote_address", "message_body", "subject"
+	  , "sent_date" and "header_xml_clob"
+      -->
+      <store_query>
+INSERT INTO inbox(
+  message_name
+, repository_name
+, message_state
+, sender
+, recipients
+, remote_host
+, remote_addr
+, message_body
+, last_updated
+, message_subject
+) VALUES (
+  :mail_id
+, :repository
+, 'root'
+, :from_address
+, :recipient
+, :remote_hostname
+, :remote_address
+, :message_body
+, sysdate
+, :subject
+)
+      </store_query>
+      <!-- This query is used to store the attachments that have been stripped from the email individually.  -->
+      <attachment_store_query>
+INSERT INTO jamesmgr.attachments(
+  message_name
+, content_type
+, content_disposition
+, file_name
+, data
+, text_data
+, datetime
+) VALUES (
+  :mail_id
+, :content_type
+, :content_disposition
+, :file_name
+, :content_data
+, :text_content
+, sysdate
+)
+      </attachment_store_query>
+    </database>
+  </database_list>
+  <!-- The recipient list has a many to 1 relationship with the databases above. -->
+  <recipient_list>
+    <recipient>
+      <!--
+      here the domain will be matched using a regular expression. Recipient domains will be matched against recipients
+      in the order they are defined here. The first match will be used.
+      -->
+      <domain_regex>.*\..*\.co.uk</domain_regex>
+      <database>singleDb</database>
+    </recipient>
+  </recipient_list>
+</smtp_config>

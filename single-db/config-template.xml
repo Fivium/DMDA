@@ -15,9 +15,9 @@
     <database>
       <name>singleDb</name>
       <!-- This is the same URL that clobber uses -->
-      <jdbc_url>$$JDBC_URL$$</jdbc_url>
-      <username>$$JDBC_USER$$</username>
-      <password>$$JDBC_PASSWORD$$</password>
+      <jdbc_url>JDBC_URL</jdbc_url>
+      <username>JDBC_USER</username>
+      <password>JDBC_PASSWORD</password>
       <!--
       This is the query the database will use to store the email in the database. The bind params are "mail_id"
       , "repository", "from_address", "recipient", "remote_hostname", "remote_address", "message_body", "subject"
@@ -49,25 +49,7 @@ INSERT INTO inbox(
 )
       </store_query>
       <!-- This query is used to store the attachments that have been stripped from the email individually.  -->
-      <attachment_store_query>
-INSERT INTO jamesmgr.attachments(
-  message_name
-, content_type
-, content_disposition
-, file_name
-, data
-, text_data
-, datetime
-) VALUES (
-  :mail_id
-, :content_type
-, :content_disposition
-, :file_name
-, :content_data
-, :text_content
-, sysdate
-)
-      </attachment_store_query>
+      <attachment_store_query />
     </database>
   </database_list>
   <!-- The recipient list has a many to 1 relationship with the databases above. -->
@@ -77,8 +59,13 @@ INSERT INTO jamesmgr.attachments(
       here the domain will be matched using a regular expression. Recipient domains will be matched against recipients
       in the order they are defined here. The first match will be used.
       -->
-      <domain_regex>.*\..*\.co.uk</domain_regex>
+      <domain_regex>.*</domain_regex>
       <database>singleDb</database>
     </recipient>
   </recipient_list>
+    <health_checks>
+        <enable_http_health_checks>true</enable_http_health_checks>
+        <port>8080</port>
+        <security_token>dev</security_token>
+    </health_checks>
 </smtp_config>

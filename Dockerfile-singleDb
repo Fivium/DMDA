@@ -11,10 +11,10 @@ RUN apk add --update tzdata \
 
 USER dmda
 COPY build/libs/dmda.jar /opt/dmda/dmda.jar
-COPY single-db/bindEnvIntoCongfig.sh /opt/dmda/bindEnvIntoCongfig.sh
-COPY single-db/config.xml /opt/dmda/config.xml
+COPY single-db/docker-entry-point.sh /opt/dmda/docker-entry-point.sh
+COPY --chown=dmda single-db/config-template.xml /opt/dmda/config-template.xml
 WORKDIR /opt/dmda/
 HEALTHCHECK CMD curl --fail http://localhost:8080/smtp-status || exit 1
 EXPOSE 2601
 
-ENTRYPOINT exec bindEnvIntoCongfig.sh config.xml  java $JAVA_OPTS -jar dmda.jar
+ENTRYPOINT exec ./docker-entry-point.sh config-template.xml

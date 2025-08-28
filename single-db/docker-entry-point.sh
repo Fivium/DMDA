@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 set -euo pipefail
 
 FILE="${1:?Usage: $0 <file>}"
@@ -10,7 +9,11 @@ FILE="${1:?Usage: $0 <file>}"
 
 # Replace placeholders with values
 sed \
-  -e "s|\$\$JDBC_URL\$\$|${JDBC_URL}|g" \
-  -e "s|\$\$JDBC_USER\$\$|${JDBC_USER}|g" \
-  -e "s|\$\$JDBC_PASSWORD\$\$|${JDBC_PASSWORD}|g" \
-  "$FILE" > "$FILE"
+  -e "s/JDBC_URL/${JDBC_URL}/g" \
+  -e "s/JDBC_USER/${JDBC_USER}/g" \
+  -e "s/JDBC_PASSWORD/${JDBC_PASSWORD}/g" \
+  "$FILE" > "config.xml"
+
+echo "Config file created. at config.xml for $JDBC_URL"
+
+java -jar dmda.jar

@@ -70,6 +70,9 @@ public class SMTPConfig {
   public void loadConfig(File pFile)
   throws ConfigurationException {
     try {
+
+      System.out.println("Loading SMTP config... "  + pFile.getAbsolutePath() + " " + pFile.getTotalSpace());
+
       DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       Document lRootDoc = dBuilder.parse(pFile);
       Element lRootElement = lRootDoc.getDocumentElement();

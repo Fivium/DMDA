@@ -140,4 +140,12 @@ public class TestEmailMessage {
     lMessage.addData(TestUtil.getTestResourceStream("unicode_subject_message.eml", this.getClass()));
     assertEquals("℀ ℁ ℂ ℃ ℄ ℅ ℆ ℇ ℈ ℉ ℊ ℋ ℌ ℍ ℎ ℏ ℐ ℑ ℒ ℓ ℔ ℕ № ℗ ℘ ℙ ℚ ℛ ℜ ℝ ℞ ℟ ℠ ℡ ™ ℣ ℤ ℥ Ω ℧ ℨ ℩ K Å ℬ ℭ ℮ ℯ ℰ ℱ Ⅎ ℳ ℴ ℵ ℶ ℷ ℸ", lMessage.getSubject());
   }
+
+  @Test
+  public void testUTF7Email() throws ParseException {
+    EmailMessage lMessage = new EmailMessage(MAIL_ID);
+    lMessage.addData(TestUtil.getTestResourceStream("utf7_message.eml", this.getClass()));
+
+    assertEquals("Test Email", lMessage.getSubject());
+  }
 }

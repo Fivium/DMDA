@@ -54,7 +54,7 @@ implements MessageHandler {
     }
     catch (InvalidRecipientException e) {
       mLogger.error("Email recipient has no configured database: " + pRecipient + ". " + mEmailMessage.toString());
-      rejectEmail("The recipient " + pRecipient + " cannot be found at this domain.");
+      rejectEmail(new RejectException("The recipient " + pRecipient + " cannot be found at this domain."));
     }
   }
 
@@ -75,8 +75,8 @@ implements MessageHandler {
       mMessageStorer.storeMessage(mEmailMessage);
       mLogger.info("Message Successfully Stored - " + mEmailMessage.toString());
     }
-    catch (RejectException ex) {
-      rejectEmail(ex.getMessage());
+    catch (RuntimeException ex) {
+      rejectEmail(ex);
     }
   }
 
@@ -88,15 +88,15 @@ implements MessageHandler {
     // Nothing to do here
   }
 
-  private void rejectEmail(String pMessage){
-    mLogger.error("Message Rejected - " + mEmailMessage.toString());
+  private void rejectEmail(RuntimeException exception){
+    mLogger.error("Message Rejected - " + mEmailMessage.toString(), exception);
     StringBuilder lErrorMessageBuilder = new StringBuilder();
 
     lErrorMessageBuilder.append(SMTPConfig.getInstance().getEmailRejectionMessage());
 
-    if (pMessage != null) {
+    if (exception instanceof RejectException && exception.getMessage() != null) {
       lErrorMessageBuilder.append(" The server gave the following reason: ");
-      lErrorMessageBuilder.append(pMessage);
+      lErrorMessageBuilder.append(exception.getMessage());
     }
 
     lErrorMessageBuilder.append(" If you contact support, please provide them with this email reference: ");

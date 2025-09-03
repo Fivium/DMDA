@@ -21,6 +21,7 @@ dependencies {
 		'ch.qos.logback:logback-classic:1.5.18',
 		'commons-io:commons-io:2.19.0',
 		'org.subethamail:subethasmtp:3.1.7',
+		'com.beetstra.jutf7:jutf7:1.0.0',
 		'com.oracle.database.jdbc:ojdbc6:11.2.0.4',
 		'org.nanohttpd:nanohttpd:2.3.1'
 	)

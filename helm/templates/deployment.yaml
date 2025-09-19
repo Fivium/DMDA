@@ -24,7 +24,7 @@ spec:
       priorityClassName: medium
       enableServiceLinks: false
       imagePullSecrets:
-        - name: quay.io
+        - name: quay-bot-token
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

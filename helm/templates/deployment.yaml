@@ -36,7 +36,7 @@ spec:
               weight: 1
       containers:
         - name: {{ .Chart.Name }}
-          image: "quay.io/fivium/dmda:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.global.cluster.ecrAppRepositoryBase }}/dmda:{{ .Chart.AppVersion }}"
           imagePullPolicy: Always
           ports:
             - containerPort: 2601

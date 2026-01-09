@@ -44,7 +44,7 @@ steps:
     settings:
       region: eu-west-2
       registry: 847993322739.dkr.ecr.eu-west-2.amazonaws.com
-      repo: ecase-app/email-scraper
+      repo: fivium-app/dmda
       tags:
         - ${DRONE_BRANCH//\//-}-${DRONE_BUILD_NUMBER}
       access_key: AKIA4K4CXHTZ7KAUZJWL
@@ -59,8 +59,6 @@ steps:
         - feature/**
       event:
         - push
-      status:
-        - success
 
   - name: publish-helm-chart
     image: quay.io/fivium/drone-helm
@@ -77,8 +75,6 @@ steps:
         - master-auto
       event:
         - push
-      status:
-        - success
 
   - name: sync-reports
     image: alpine:3

@@ -34,7 +34,7 @@ spec:
               weight: 1
       containers:
         - name: {{ .Chart.Name }}
-          image: "847993322739.dkr.ecr.eu-west-2.amazonaws.com/fivium-app/dmda:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.global.cluster.ecrRepositoryBase }}fivium-app/dmda:{{ .Chart.AppVersion }}"
           imagePullPolicy: Always
           ports:
             - containerPort: 2601

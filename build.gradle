@@ -18,8 +18,8 @@ dependencies {
 	implementation (
 		'fi.solita.clamav:clamav-client:1.0.1',
 		'com.zaxxer:HikariCP-java6:2.3.13',
-		'ch.qos.logback:logback-classic:1.5.18',
-		'commons-io:commons-io:2.19.0',
+		'ch.qos.logback:logback-classic:1.5.27',
+		'commons-io:commons-io:2.21.0',
 		'org.subethamail:subethasmtp:3.1.7',
 		'com.beetstra.jutf7:jutf7:1.0.0',
 		'com.oracle.database.jdbc:ojdbc6:11.2.0.4',

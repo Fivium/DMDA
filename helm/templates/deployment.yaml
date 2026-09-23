@@ -20,6 +20,8 @@ spec:
         netpol.ingress.nginx: "true"
         netpol.egress.database: "true"
         netpol.egress.clamav: "true"
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/externalSecretTemplate.yaml") . | sha256sum }}
     spec:
       priorityClassName: medium
       enableServiceLinks: false
